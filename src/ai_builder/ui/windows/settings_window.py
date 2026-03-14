@@ -168,7 +168,7 @@ class SettingsWindow(QDialog):
             resp = requests.get(
                 url, headers=headers, params=params,
                 timeout=nn_conf.request_timeout_seconds,
-                verify=nn_conf.ssl_verify,
+                verify=nn_conf.get_sigma_ssl_verify(),
             )
             if resp.status_code == 200:
                 self.sigma_api_key_valid = True
@@ -279,7 +279,7 @@ class SettingsWindow(QDialog):
         try:
             resp = requests.get(
                 url, timeout=nn_conf.request_timeout_seconds,
-                verify=nn_conf.ssl_verify,
+                verify=nn_conf.get_sigma_ssl_verify(),
             )
             is_alive = resp.status_code == 200 and resp.json().get('status') == 'ok'
         except Exception:

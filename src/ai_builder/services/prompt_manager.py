@@ -5,6 +5,8 @@ prompts.json CRUD 및 순서 관리를 담당합니다.
 """
 
 import json
+import shutil
+import sys
 import uuid
 from datetime import datetime
 from pathlib import Path
@@ -23,14 +25,19 @@ class PromptManager:
 
     def _resolve_prompts_path(self) -> Path:
         """prompts.json 경로 결정"""
-        # 1순위: root_path 내부 (패키지 내부)
-        pkg_path = nn_conf.root_path / 'ai_builder' / 'data' / 'prompts.json'
-        if pkg_path.exists():
-            return pkg_path
+        bundled_path = nn_conf.root_path / 'ai_builder' / 'data' / 'prompts.json'
+        dev_source_path = nn_conf.project_path / 'src' / 'ai_builder' / 'data' / 'prompts.json'
 
-        # 2순위: data 디렉토리
-        data_path = nn_conf.data_path / 'prompts.json'
-        return data_path
+        # 개발 환경은 문서 명세대로 src 내부 파일을 사용
+        if not getattr(sys, 'frozen', False) and dev_source_path.exists():
+            return dev_source_path
+
+        # 배포 환경은 사용자 데이터 경로를 사용하되, 초기 파일은 번들에서 복사
+        runtime_path = nn_conf.data_path / 'prompts.json'
+        if not runtime_path.exists() and bundled_path.exists():
+            runtime_path.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(bundled_path, runtime_path)
+        return runtime_path
 
     def load_prompts(self) -> list[dict]:
         """프롬프트 목록 로드 (order 순 정렬)"""

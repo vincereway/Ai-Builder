@@ -7,6 +7,7 @@
 import time
 
 import requests
+import urllib3
 
 from ai_builder.constants.enums import (
     HEALTH_SIMPLE_URL, ENCOUNTERS_URL,
@@ -25,7 +26,9 @@ class SigmaApiClient:
         self.api_key = api_key
         self.base_url = f"https://{server_ip}:{nn_conf.sigma_server_port}"
         self.timeout = nn_conf.request_timeout_seconds
-        self.verify = nn_conf.ssl_verify
+        self.verify = nn_conf.get_sigma_ssl_verify()
+        if self.verify is False:
+            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
     def _headers(self) -> dict:
         """공통 인증 헤더"""
@@ -96,7 +99,12 @@ class SigmaApiClient:
                 timeout=self.timeout, verify=self.verify,
             )
             if resp.status_code == 200:
-                return resp.json()
+                data = resp.json()
+                if not isinstance(data, dict):
+                    return {'error': '진료 목록 응답 형식이 올바르지 않습니다.'}
+                if 'results' not in data or 'pagination' not in data:
+                    return {'error': '진료 목록 응답에 results 또는 pagination이 없습니다.'}
+                return data
 
             # 429 Rate Limit 처리: 1회 자동 재시도
             if resp.status_code == 429:
@@ -108,7 +116,12 @@ class SigmaApiClient:
                     timeout=self.timeout, verify=self.verify,
                 )
                 if resp.status_code == 200:
-                    return resp.json()
+                    data = resp.json()
+                    if not isinstance(data, dict):
+                        return {'error': '진료 목록 응답 형식이 올바르지 않습니다.'}
+                    if 'results' not in data or 'pagination' not in data:
+                        return {'error': '진료 목록 응답에 results 또는 pagination이 없습니다.'}
+                    return data
 
             return {'error': self._handle_error(resp)}
         except requests.ConnectionError:

@@ -5,7 +5,7 @@
 전체 앱 기능을 통합 관리합니다.
 """
 
-from PySide6.QtCore import Qt, QDate
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QMainWindow, QListWidgetItem
 
 from ai_builder.ui.generated.main_window_ui import Ui_MainWindow
@@ -78,17 +78,8 @@ class MainWindow(QMainWindow):
         # 프롬프트 편집 영역 비활성화
         self._set_prompt_edit_enabled(False)
 
-        # 연결 상태 확인
-        if self.current_server_ip:
-            client = self._create_api_client()
-            if client:
-                alive = client.health_check()
-                self.connection_alive = alive
-                self._update_connection_status(alive)
-            else:
-                self._update_connection_status(None)
-        else:
-            self._update_connection_status(None)
+        # 앱 시작 시에는 경고창 없이 저장된 IP로 헬스체크만 수행
+        self._refresh_connection_state_silently()
 
     # ── 2. 시그널-슬롯 연결 ──
 
@@ -186,6 +177,7 @@ class MainWindow(QMainWindow):
 
     def _on_encounter_error(self, error_msg: str):
         """진료 조회 오류"""
+        self._handle_sigma_connection_failure(error_msg)
         show_error(self, "조회 오류", error_msg)
         app_logger.error(f"진료 조회 오류: {error_msg}")
 
@@ -383,7 +375,6 @@ class MainWindow(QMainWindow):
 
         self._enhance_worker = EnhanceWorker(
             agent_type=self.current_ai_agent,
-            api_key=api_key,
             prompt_text=prompt['content'],
             plain_note=self.current_plain_note,
         )
@@ -443,6 +434,7 @@ class MainWindow(QMainWindow):
 
     def _on_save_error(self, error_msg: str):
         """저장 오류"""
+        self._handle_sigma_connection_failure(error_msg)
         show_error(self, "저장 오류", error_msg)
         app_logger.error(f"저장 오류: {error_msg}")
 
@@ -470,6 +462,7 @@ class MainWindow(QMainWindow):
         self.current_server_ip = nn_conf.sigma_server_ip or None
         self.current_sigma_api_key = nn_conf.sigma_api_key or None
         self._refresh_ai_agent_combo()
+        self._refresh_connection_state_silently()
 
     def _on_connection_state_changed(self, is_alive: bool):
         """설정 뷰에서 연결 상태 변경 시 메인 뷰 동기화"""
@@ -486,6 +479,27 @@ class MainWindow(QMainWindow):
             icon, text = "🔴", "끊김"
         self.ui.lbl_connection_status_icon.setText(icon)
         self.ui.lbl_connection_status_text.setText(text)
+
+    def _refresh_connection_state_silently(self):
+        """경고창 없이 현재 설정 기준 연결 상태를 갱신"""
+        if not self.current_server_ip:
+            self.connection_alive = False
+            self._update_connection_status(None)
+            return
+
+        client = SigmaApiClient(self.current_server_ip, self.current_sigma_api_key or '')
+        self.connection_alive = client.health_check()
+        self._update_connection_status(self.connection_alive)
+
+    def _handle_sigma_connection_failure(self, error_msg: str):
+        """시그마 서버 연결 실패성 오류면 상태를 끊김으로 갱신"""
+        disconnect_markers = (
+            '서버에 연결할 수 없습니다',
+            '요청 시간이 초과되었습니다',
+        )
+        if any(marker in error_msg for marker in disconnect_markers):
+            self.connection_alive = False
+            self._update_connection_status(False)
 
     def _create_api_client(self) -> SigmaApiClient | None:
         """현재 설정으로 SigmaApiClient 생성"""

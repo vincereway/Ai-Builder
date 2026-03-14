@@ -11,6 +11,7 @@ from ai_builder.constants.enums import (
     OPENAI_RESPONSES_URL, OPENAI_MODELS_URL, OPENAI_MODEL,
     AI_AGENT_GEMINI, AI_AGENT_OPENAI,
 )
+from conf.nnconf.nnconfig import nn_conf
 from conf.nnconf.nnlogger import ai_logger
 
 
@@ -40,18 +41,21 @@ class AiService:
             return False
 
     @staticmethod
-    def enhance_with_gemini(api_key: str, prompt_text: str, plain_note: str) -> str:
+    def enhance_with_gemini(prompt_text: str, plain_note: str) -> str:
         """
         Gemini API 호출
 
         Args:
-            api_key: Gemini API 키
             prompt_text: 시스템 프롬프트 (선택된 프롬프트 내용)
             plain_note: 사용자 입력 (진료 기록 텍스트)
 
         Returns:
             AI 응답 텍스트
         """
+        api_key = nn_conf.gemini_api_key
+        if not api_key:
+            raise RuntimeError('Gemini API 키가 설정되지 않았습니다.')
+
         url = GEMINI_API_URL.format(model=GEMINI_MODEL)
         params = {'key': api_key}
         body = {
@@ -89,18 +93,21 @@ class AiService:
         return text
 
     @staticmethod
-    def enhance_with_openai(api_key: str, prompt_text: str, plain_note: str) -> str:
+    def enhance_with_openai(prompt_text: str, plain_note: str) -> str:
         """
         OpenAI Responses API 호출
 
         Args:
-            api_key: OpenAI API 키
             prompt_text: 시스템 프롬프트 (instructions)
             plain_note: 사용자 입력 (input)
 
         Returns:
             AI 응답 텍스트
         """
+        api_key = nn_conf.openai_api_key
+        if not api_key:
+            raise RuntimeError('OpenAI API 키가 설정되지 않았습니다.')
+
         headers = {
             'Authorization': f'Bearer {api_key}',
             'Content-Type': 'application/json',
@@ -142,13 +149,12 @@ class AiService:
         return text
 
     @staticmethod
-    def enhance(agent_type: str, api_key: str, prompt_text: str, plain_note: str) -> str:
+    def enhance(agent_type: str, prompt_text: str, plain_note: str) -> str:
         """
         선택된 AI 모델로 Enhance 실행
 
         Args:
             agent_type: 'gemini' 또는 'openai'
-            api_key: 해당 AI의 API 키
             prompt_text: 시스템 프롬프트
             plain_note: 진료 기록 텍스트
 
@@ -156,8 +162,8 @@ class AiService:
             AI 응답 텍스트
         """
         if agent_type == AI_AGENT_GEMINI:
-            return AiService.enhance_with_gemini(api_key, prompt_text, plain_note)
+            return AiService.enhance_with_gemini(prompt_text, plain_note)
         elif agent_type == AI_AGENT_OPENAI:
-            return AiService.enhance_with_openai(api_key, prompt_text, plain_note)
+            return AiService.enhance_with_openai(prompt_text, plain_note)
         else:
             raise ValueError(f"지원하지 않는 AI Agent: {agent_type}")

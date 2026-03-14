@@ -43,6 +43,8 @@ class Config:
         self.data_path: Path = self.project_path / 'data'
         self.conf_file_path: Path = self.project_path / 'conf' / 'conf.yml'
         self.resources_path: Path = self.project_path / 'resources'
+        self.certs_path: Path = self.project_path / 'certs'
+        self.sigma_root_ca_path: Path = self.certs_path / 'rootCA.pem'
 
         # 기본값 초기화
         self.sigma_server_ip: str = ''
@@ -100,6 +102,14 @@ class Config:
         if 'SSL_VERIFY' in data:
             self.ssl_verify = bool(data['SSL_VERIFY'])
 
+    def get_sigma_ssl_verify(self):
+        """Sigma 서버용 SSL 검증 옵션 반환"""
+        if not self.ssl_verify:
+            return False
+        if self.sigma_root_ca_path.exists():
+            return str(self.sigma_root_ca_path)
+        return True
+
     def save_config(self, key: str, value) -> None:
         """개별 설정 값을 conf.yml에 저장"""
         # 현재 파일 로드
@@ -125,8 +135,8 @@ class Config:
             setattr(self, attr_name, value)
 
     def ensure_directories(self) -> None:
-        """logs/, data/ 디렉토리가 없으면 생성"""
-        for path in [self.logs_path, self.data_path]:
+        """앱 실행에 필요한 디렉토리가 없으면 생성"""
+        for path in [self.logs_path, self.data_path, self.certs_path]:
             try:
                 path.mkdir(parents=True, exist_ok=True)
             except OSError as e:

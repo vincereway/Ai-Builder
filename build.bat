@@ -9,7 +9,10 @@ echo.
 
 REM [1/4] Git 브랜치 표시
 echo [1/4] Git 브랜치 확인
-for /f "tokens=*" %%i in ('git rev-parse --abbrev-ref HEAD 2^>nul') do set BRANCH=%%i
+where git >nul 2>&1
+if %ERRORLEVEL% EQU 0 (
+    for /f "usebackq delims=" %%i in (`git rev-parse --abbrev-ref HEAD`) do set BRANCH=%%i
+)
 if defined BRANCH (
     echo   현재 브랜치: %BRANCH%
 ) else (
@@ -28,11 +31,7 @@ echo.
 
 REM [3/4] PyInstaller 빌드
 echo [3/4] PyInstaller 빌드
-if exist "scripts\build\AiBuilder.spec" (
-    pyinstaller scripts\build\AiBuilder.spec --noconfirm
-) else (
-    pyinstaller --onefile --windowed --name AiBuilder --icon=resources\icon.ico --add-data "conf;conf" main.py
-)
+call scripts\build\build_ai_builder.bat
 if %ERRORLEVEL% NEQ 0 (
     echo   ❌ PyInstaller 빌드 실패
     goto :error

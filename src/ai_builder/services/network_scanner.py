@@ -49,7 +49,11 @@ class NetworkScanner:
         url = f"https://{ip}:{nn_conf.sigma_server_port}/health/simple/"
         timeout_sec = nn_conf.scan_timeout_ms / 1000.0
         try:
-            resp = requests.get(url, timeout=timeout_sec, verify=False)
+            resp = requests.get(
+                url,
+                timeout=timeout_sec,
+                verify=nn_conf.get_sigma_ssl_verify(),
+            )
             if resp.status_code == 200:
                 data = resp.json()
                 if data.get('status') == 'ok':

@@ -1,0 +1,4 @@
+PySide6>=6.8.0
+requests>=2.31.0
+PyYAML>=6.0
+PyInstaller>=6.0

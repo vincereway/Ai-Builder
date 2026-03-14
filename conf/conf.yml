@@ -1,0 +1,19 @@
+# 시그마차트 서버 설정
+SIGMA_SERVER_IP: ""
+SIGMA_SERVER_PORT: 57443
+SIGMA_API_KEY: ""
+
+# AI API 키
+GEMINI_API_KEY: ""
+OPENAI_API_KEY: ""
+
+# AI Agent 선택 (gemini / openai)
+SELECTED_AI_AGENT: "gemini"
+
+# 로그 레벨
+LOG_LEVEL: "DEBUG"
+
+# 네트워크 설정
+REQUEST_TIMEOUT_SECONDS: 10
+SCAN_TIMEOUT_MS: 300
+SSL_VERIFY: false

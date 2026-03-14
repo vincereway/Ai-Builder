@@ -5,7 +5,7 @@
 전체 앱 기능을 통합 관리합니다.
 """
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QDate
 from PySide6.QtWidgets import QMainWindow, QListWidgetItem
 
 from ai_builder.ui.generated.main_window_ui import Ui_MainWindow
@@ -60,6 +60,7 @@ class MainWindow(QMainWindow):
         # 초기화
         self._load_initial_state()
         self._setup_connections()
+        self._load_initial_encounters_if_available()
 
     # ── 1. 초기 상태 로드 ──
 
@@ -68,6 +69,10 @@ class MainWindow(QMainWindow):
         self.current_server_ip = nn_conf.sigma_server_ip or None
         self.current_sigma_api_key = nn_conf.sigma_api_key or None
         self.current_ai_agent = nn_conf.selected_ai_agent or None
+
+        # 날짜 기본값은 오늘
+        self.ui.date_edit_encounter.setDate(QDate.currentDate())
+        self.ui.date_edit_encounter.setCalendarPopup(True)
 
         # AI 콤보박스 초기화
         self._refresh_ai_agent_combo()
@@ -90,7 +95,9 @@ class MainWindow(QMainWindow):
 
         # 진료 조회
         self.ui.btn_load_encounters.clicked.connect(self._on_load_encounters_clicked)
-        self.ui.btn_load_encounter_detail.clicked.connect(self._on_load_encounter_detail_clicked)
+        self.ui.btn_prev_date.clicked.connect(self._on_prev_date_clicked)
+        self.ui.btn_next_date.clicked.connect(self._on_next_date_clicked)
+        self.ui.btn_go_today.clicked.connect(self._on_go_today_clicked)
 
         # 프롬프트
         self.ui.list_prompts.currentRowChanged.connect(self._on_prompt_selected)
@@ -141,7 +148,11 @@ class MainWindow(QMainWindow):
     # ── 5. 진료 목록 조회 ──
 
     def _on_load_encounters_clicked(self):
-        """[목록조회] 클릭"""
+        """[조회] 클릭"""
+        self._load_encounters_for_selected_date()
+
+    def _load_encounters_for_selected_date(self):
+        """현재 선택된 날짜의 진료 목록 조회"""
         client = self._create_api_client()
         if not client:
             return
@@ -157,6 +168,21 @@ class MainWindow(QMainWindow):
         self._encounter_worker.error.connect(self._on_encounter_error)
         self._encounter_worker.finished.connect(self._restore_encounter_button)
         self._encounter_worker.start()
+
+    def _on_prev_date_clicked(self):
+        """이전 날짜로 이동 후 자동 조회"""
+        self.ui.date_edit_encounter.setDate(self.ui.date_edit_encounter.date().addDays(-1))
+        self._load_encounters_for_selected_date()
+
+    def _on_next_date_clicked(self):
+        """다음 날짜로 이동 후 자동 조회"""
+        self.ui.date_edit_encounter.setDate(self.ui.date_edit_encounter.date().addDays(1))
+        self._load_encounters_for_selected_date()
+
+    def _on_go_today_clicked(self):
+        """오늘 날짜로 이동 후 자동 조회"""
+        self.ui.date_edit_encounter.setDate(QDate.currentDate())
+        self._load_encounters_for_selected_date()
 
     def _on_encounters_loaded(self, encounters: list):
         """진료 목록 수신"""
@@ -184,7 +210,7 @@ class MainWindow(QMainWindow):
     def _restore_encounter_button(self):
         """목록조회 버튼 복원"""
         self.ui.btn_load_encounters.setEnabled(True)
-        self.ui.btn_load_encounters.setText("목록조회")
+        self.ui.btn_load_encounters.setText("조회")
 
     # ── 6. 진료 상세 조회 ──
 
@@ -490,6 +516,14 @@ class MainWindow(QMainWindow):
         client = SigmaApiClient(self.current_server_ip, self.current_sigma_api_key or '')
         self.connection_alive = client.health_check()
         self._update_connection_status(self.connection_alive)
+
+    def _load_initial_encounters_if_available(self):
+        """앱 시작 직후 오늘 날짜 진료 목록 자동 조회"""
+        if not self.current_server_ip or not self.current_sigma_api_key:
+            return
+        if not self.connection_alive:
+            return
+        self._load_encounters_for_selected_date()
 
     def _handle_sigma_connection_failure(self, error_msg: str):
         """시그마 서버 연결 실패성 오류면 상태를 끊김으로 갱신"""

@@ -1,5 +1,5 @@
 """
-프롬프트 데이터 모델
+System Prompt 데이터 모델
 """
 
 from dataclasses import dataclass, field
@@ -8,8 +8,8 @@ import uuid
 
 
 @dataclass
-class Prompt:
-    """프롬프트 항목"""
+class SystemPrompt:
+    """System Prompt 항목"""
     id: str = field(default_factory=lambda: str(uuid.uuid4()))
     title: str = ""
     content: str = ""
@@ -29,7 +29,7 @@ class Prompt:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> 'Prompt':
+    def from_dict(cls, data: dict) -> 'SystemPrompt':
         """딕셔너리에서 생성"""
         return cls(
             id=data.get('id', str(uuid.uuid4())),

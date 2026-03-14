@@ -152,6 +152,13 @@
            </property>
           </widget>
          </item>
+                 <item>
+                    <widget class="QLabel" name="lbl_enhanced_result_status">
+                     <property name="text">
+                        <string>저장할 Enhance 결과가 없습니다.</string>
+                     </property>
+                    </widget>
+                 </item>
         </layout>
        </item>
       </layout>
@@ -191,34 +198,34 @@
      </widget>
     </item>
     <item>
-     <widget class="QGroupBox" name="group_prompts">
+     <widget class="QGroupBox" name="group_system_prompts">
       <property name="title">
-       <string>프롬프트 관리</string>
+       <string>System Prompt</string>
       </property>
       <layout class="QHBoxLayout">
        <item>
         <layout class="QVBoxLayout">
          <item>
-          <widget class="QListWidget" name="list_prompts"/>
+          <widget class="QListWidget" name="list_system_prompts"/>
          </item>
          <item>
           <layout class="QHBoxLayout">
            <item>
-            <widget class="QPushButton" name="btn_prompt_new">
+            <widget class="QPushButton" name="btn_sp_new">
              <property name="text">
               <string>신규</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="btn_prompt_edit">
+            <widget class="QPushButton" name="btn_sp_edit">
              <property name="text">
               <string>수정</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="btn_prompt_delete">
+            <widget class="QPushButton" name="btn_sp_delete">
              <property name="text">
               <string>삭제</string>
              </property>
@@ -229,14 +236,14 @@
          <item>
           <layout class="QHBoxLayout">
            <item>
-            <widget class="QPushButton" name="btn_prompt_move_up">
+            <widget class="QPushButton" name="btn_sp_move_up">
              <property name="text">
               <string>▲ 위</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="btn_prompt_move_down">
+            <widget class="QPushButton" name="btn_sp_move_down">
              <property name="text">
               <string>▼ 아래</string>
              </property>
@@ -258,7 +265,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="edit_prompt_title"/>
+            <widget class="QLineEdit" name="edit_sp_title"/>
            </item>
           </layout>
          </item>
@@ -270,7 +277,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QPlainTextEdit" name="txt_prompt_content"/>
+          <widget class="QPlainTextEdit" name="txt_sp_content"/>
          </item>
          <item>
           <layout class="QHBoxLayout">
@@ -288,7 +295,7 @@
             </spacer>
            </item>
            <item>
-            <widget class="QPushButton" name="btn_prompt_save">
+            <widget class="QPushButton" name="btn_sp_save">
              <property name="text">
               <string>저장</string>
              </property>

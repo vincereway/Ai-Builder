@@ -46,7 +46,7 @@ class AiService:
         Gemini API 호출
 
         Args:
-            prompt_text: 시스템 프롬프트 (선택된 프롬프트 내용)
+            prompt_text: System Prompt (선택된 System Prompt 내용)
             plain_note: 사용자 입력 (진료 기록 텍스트)
 
         Returns:
@@ -98,7 +98,7 @@ class AiService:
         OpenAI Responses API 호출
 
         Args:
-            prompt_text: 시스템 프롬프트 (instructions)
+            prompt_text: System Prompt (instructions)
             plain_note: 사용자 입력 (input)
 
         Returns:
@@ -155,7 +155,7 @@ class AiService:
 
         Args:
             agent_type: 'gemini' 또는 'openai'
-            prompt_text: 시스템 프롬프트
+            prompt_text: System Prompt
             plain_note: 진료 기록 텍스트
 
         Returns:

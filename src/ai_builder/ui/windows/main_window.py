@@ -1,9 +1,11 @@
 """
 메인 윈도우
 
-진료 목록 조회, 프롬프트 관리, AI Enhance, 시그마차트 저장 등
+진료 목록 조회, System Prompt 관리, AI Enhance, 시그마차트 저장 등
 전체 앱 기능을 통합 관리합니다.
 """
+
+import json
 
 from PySide6.QtCore import Qt, QDate
 from PySide6.QtWidgets import QMainWindow, QListWidgetItem
@@ -11,7 +13,7 @@ from PySide6.QtWidgets import QMainWindow, QListWidgetItem
 from ai_builder.ui.generated.main_window_ui import Ui_MainWindow
 from ai_builder.ui.windows.settings_window import SettingsWindow
 from ai_builder.services.sigma_api import SigmaApiClient
-from ai_builder.services.prompt_manager import PromptManager
+from ai_builder.services.system_prompt_manager import SystemPromptManager
 from ai_builder.workers.encounter_worker import EncounterWorker
 from ai_builder.workers.enhance_worker import EnhanceWorker
 from ai_builder.workers.save_worker import SaveWorker
@@ -39,15 +41,15 @@ class MainWindow(QMainWindow):
         self.current_plain_note: str = ''
         self.current_enhanced_text: str = ''
         self.current_encounter_uuid: str | None = None
-        self.current_prompt_id: str | None = None
+        self.current_sp_id: str | None = None
         self.current_ai_agent: str | None = None
         self.connection_alive: bool = False
 
         # 편집 모드 상태
-        self._prompt_edit_mode: str | None = None  # 'new' 또는 'edit'
+        self._sp_edit_mode: str | None = None  # 'new' 또는 'edit'
 
         # 서비스
-        self.prompt_manager = PromptManager()
+        self.sp_manager = SystemPromptManager()
 
         # 워커 참조 (GC 방지)
         self._encounter_worker: EncounterWorker | None = None
@@ -77,11 +79,14 @@ class MainWindow(QMainWindow):
         # AI 콤보박스 초기화
         self._refresh_ai_agent_combo()
 
-        # 프롬프트 목록 로드
-        self._load_prompt_list()
+        # System Prompt 목록 로드
+        self._load_sp_list()
 
-        # 프롬프트 편집 영역 비활성화
-        self._set_prompt_edit_enabled(False)
+        # System Prompt 편집 영역 비활성화
+        self._set_sp_edit_enabled(False)
+
+        # Enhance 결과 저장 버튼은 유효한 JSON이 있을 때만 활성화
+        self._update_save_button_state()
 
         # 앱 시작 시에는 경고창 없이 저장된 IP로 헬스체크만 수행
         self._refresh_connection_state_silently()
@@ -98,20 +103,22 @@ class MainWindow(QMainWindow):
         self.ui.btn_prev_date.clicked.connect(self._on_prev_date_clicked)
         self.ui.btn_next_date.clicked.connect(self._on_next_date_clicked)
         self.ui.btn_go_today.clicked.connect(self._on_go_today_clicked)
+        self.ui.list_encounters.currentItemChanged.connect(self._on_encounter_item_clicked)
 
-        # 프롬프트
-        self.ui.list_prompts.currentRowChanged.connect(self._on_prompt_selected)
-        self.ui.btn_prompt_new.clicked.connect(self._on_prompt_new_clicked)
-        self.ui.btn_prompt_edit.clicked.connect(self._on_prompt_edit_clicked)
-        self.ui.btn_prompt_delete.clicked.connect(self._on_prompt_delete_clicked)
-        self.ui.btn_prompt_move_up.clicked.connect(self._on_prompt_move_up_clicked)
-        self.ui.btn_prompt_move_down.clicked.connect(self._on_prompt_move_down_clicked)
-        self.ui.btn_prompt_save.clicked.connect(self._on_prompt_save_clicked)
+        # System Prompt
+        self.ui.list_system_prompts.currentRowChanged.connect(self._on_sp_selected)
+        self.ui.btn_sp_new.clicked.connect(self._on_sp_new_clicked)
+        self.ui.btn_sp_edit.clicked.connect(self._on_sp_edit_clicked)
+        self.ui.btn_sp_delete.clicked.connect(self._on_sp_delete_clicked)
+        self.ui.btn_sp_move_up.clicked.connect(self._on_sp_move_up_clicked)
+        self.ui.btn_sp_move_down.clicked.connect(self._on_sp_move_down_clicked)
+        self.ui.btn_sp_save.clicked.connect(self._on_sp_save_clicked)
 
         # AI
         self.ui.combo_ai_agent.currentTextChanged.connect(self._on_ai_agent_changed)
         self.ui.btn_enhance.clicked.connect(self._on_enhance_clicked)
         self.ui.btn_save_to_sigma.clicked.connect(self._on_save_to_sigma_clicked)
+        self.ui.txt_enhanced_result.textChanged.connect(self._on_enhanced_text_changed)
 
     # ── 3. AI Agent 콤보박스 갱신 ──
 
@@ -134,16 +141,16 @@ class MainWindow(QMainWindow):
         self.ui.combo_ai_agent.blockSignals(False)
         self.current_ai_agent = self.ui.combo_ai_agent.currentData()
 
-    # ── 4. 프롬프트 목록 로드 ──
+    # ── 4. System Prompt 목록 로드 ──
 
-    def _load_prompt_list(self):
-        """프롬프트 목록을 QListWidget에 렌더링"""
-        self.ui.list_prompts.clear()
-        prompts = self.prompt_manager.load_prompts()
+    def _load_sp_list(self):
+        """System Prompt 목록을 QListWidget에 렌더링"""
+        self.ui.list_system_prompts.clear()
+        prompts = self.sp_manager.load_system_prompts()
         for p in prompts:
             item = QListWidgetItem(p['title'])
             item.setData(Qt.ItemDataRole.UserRole, p['id'])
-            self.ui.list_prompts.addItem(item)
+            self.ui.list_system_prompts.addItem(item)
 
     # ── 5. 진료 목록 조회 ──
 
@@ -214,6 +221,25 @@ class MainWindow(QMainWindow):
 
     # ── 6. 진료 상세 조회 ──
 
+    def _on_encounter_item_clicked(self, current, previous):
+        """환자 목록에서 항목 클릭 시 자동 상세 조회"""
+        if not current:
+            return
+
+        client = self._create_api_client()
+        if not client:
+            return
+
+        encounter_uuid = current.data(Qt.ItemDataRole.UserRole)
+        self.current_encounter_uuid = encounter_uuid
+
+        self._encounter_worker = EncounterWorker(
+            client, mode='detail', encounter_uuid=encounter_uuid
+        )
+        self._encounter_worker.detail_loaded.connect(self._on_detail_loaded)
+        self._encounter_worker.error.connect(self._on_encounter_error)
+        self._encounter_worker.start()
+
     def _on_load_encounter_detail_clicked(self):
         """[조회] 클릭"""
         current_item = self.ui.list_encounters.currentItem()
@@ -242,113 +268,114 @@ class MainWindow(QMainWindow):
         self.ui.txt_plain_note.setPlainText(plain_note)
         self.ui.txt_enhanced_result.clear()
         self.current_enhanced_text = ''
+        self._update_save_button_state()
         app_logger.info(f"진료 상세 조회 완료: {self.current_encounter_uuid}")
 
-    # ── 7. 프롬프트 선택 ──
+    # ── 7. System Prompt 선택 ──
 
-    def _on_prompt_selected(self, row: int):
-        """프롬프트 목록 클릭: 내용 표시 (읽기 전용)"""
+    def _on_sp_selected(self, row: int):
+        """System Prompt 목록 클릭: 내용 표시 (읽기 전용)"""
         if row < 0:
-            self.current_prompt_id = None
+            self.current_sp_id = None
             return
 
-        item = self.ui.list_prompts.item(row)
+        item = self.ui.list_system_prompts.item(row)
         if not item:
             return
 
-        prompt_id = item.data(Qt.ItemDataRole.UserRole)
-        self.current_prompt_id = prompt_id
-        prompt = self.prompt_manager.get_prompt_by_id(prompt_id)
-        if prompt:
-            self.ui.edit_prompt_title.setText(prompt['title'])
-            self.ui.txt_prompt_content.setPlainText(prompt['content'])
+        sp_id = item.data(Qt.ItemDataRole.UserRole)
+        self.current_sp_id = sp_id
+        sp = self.sp_manager.get_system_prompt_by_id(sp_id)
+        if sp:
+            self.ui.edit_sp_title.setText(sp['title'])
+            self.ui.txt_sp_content.setPlainText(sp['content'])
 
         # 편집 모드가 아닌 경우 읽기 전용
-        if not self._prompt_edit_mode:
-            self._set_prompt_edit_enabled(False)
+        if not self._sp_edit_mode:
+            self._set_sp_edit_enabled(False)
 
-    # ── 8. 프롬프트 신규 ──
+    # ── 8. System Prompt 신규 ──
 
-    def _on_prompt_new_clicked(self):
+    def _on_sp_new_clicked(self):
         """[신규] 클릭: 빈 편집 영역 활성화"""
-        self._prompt_edit_mode = 'new'
-        self.current_prompt_id = None
-        self.ui.edit_prompt_title.clear()
-        self.ui.txt_prompt_content.clear()
-        self._set_prompt_edit_enabled(True)
-        self.ui.edit_prompt_title.setFocus()
+        self._sp_edit_mode = 'new'
+        self.current_sp_id = None
+        self.ui.edit_sp_title.clear()
+        self.ui.txt_sp_content.clear()
+        self._set_sp_edit_enabled(True)
+        self.ui.edit_sp_title.setFocus()
 
-    # ── 9. 프롬프트 수정 ──
+    # ── 9. System Prompt 수정 ──
 
-    def _on_prompt_edit_clicked(self):
-        """[수정] 클릭: 선택된 프롬프트 편집 활성화"""
-        if not self.current_prompt_id:
-            show_warning(self, "알림", "수정할 프롬프트를 선택해 주세요.")
+    def _on_sp_edit_clicked(self):
+        """[수정] 클릭: 선택된 System Prompt 편집 활성화"""
+        if not self.current_sp_id:
+            show_warning(self, "알림", "수정할 System Prompt를 선택해 주세요.")
             return
-        self._prompt_edit_mode = 'edit'
-        self._set_prompt_edit_enabled(True)
-        self.ui.edit_prompt_title.setFocus()
+        self._sp_edit_mode = 'edit'
+        self._set_sp_edit_enabled(True)
+        self.ui.edit_sp_title.setFocus()
 
-    # ── 10. 프롬프트 삭제 ──
+    # ── 10. System Prompt 삭제 ──
 
-    def _on_prompt_delete_clicked(self):
+    def _on_sp_delete_clicked(self):
         """[삭제] 클릭"""
-        if not self.current_prompt_id:
-            show_warning(self, "알림", "삭제할 프롬프트를 선택해 주세요.")
+        if not self.current_sp_id:
+            show_warning(self, "알림", "삭제할 System Prompt를 선택해 주세요.")
             return
-        if not show_confirm(self, "삭제 확인", "선택한 프롬프트를 삭제할까요?"):
+        if not show_confirm(self, "삭제 확인", "선택한 System Prompt를 삭제할까요?"):
             return
-        self.prompt_manager.delete_prompt(self.current_prompt_id)
-        self.current_prompt_id = None
-        self._load_prompt_list()
-        self.ui.edit_prompt_title.clear()
-        self.ui.txt_prompt_content.clear()
-        self._set_prompt_edit_enabled(False)
+        self.sp_manager.delete_system_prompt(self.current_sp_id)
+        self.current_sp_id = None
+        self._load_sp_list()
+        self.ui.edit_sp_title.clear()
+        self.ui.txt_sp_content.clear()
+        self._set_sp_edit_enabled(False)
 
-    # ── 11. 프롬프트 위로 이동 ──
+    # ── 11. System Prompt 위로 이동 ──
 
-    def _on_prompt_move_up_clicked(self):
+    def _on_sp_move_up_clicked(self):
         """[▲ 위] 클릭"""
-        if not self.current_prompt_id:
+        if not self.current_sp_id:
             return
-        self.prompt_manager.move_up(self.current_prompt_id)
-        self._load_prompt_list()
-        self._select_prompt_by_id(self.current_prompt_id)
+        self.sp_manager.move_up(self.current_sp_id)
+        self._load_sp_list()
+        self._select_sp_by_id(self.current_sp_id)
 
-    # ── 12. 프롬프트 아래로 이동 ──
+    # ── 12. System Prompt 아래로 이동 ──
 
-    def _on_prompt_move_down_clicked(self):
+    def _on_sp_move_down_clicked(self):
         """[▼ 아래] 클릭"""
-        if not self.current_prompt_id:
+        if not self.current_sp_id:
             return
-        self.prompt_manager.move_down(self.current_prompt_id)
-        self._load_prompt_list()
-        self._select_prompt_by_id(self.current_prompt_id)
+        self.sp_manager.move_down(self.current_sp_id)
+        self._load_sp_list()
+        self._select_sp_by_id(self.current_sp_id)
 
-    # ── 13. 프롬프트 저장 ──
+    # ── 13. System Prompt 저장 ──
 
-    def _on_prompt_save_clicked(self):
+    def _on_sp_save_clicked(self):
         """[저장] 클릭"""
-        title = self.ui.edit_prompt_title.text().strip()
-        content = self.ui.txt_prompt_content.toPlainText().strip()
+        title = self.ui.edit_sp_title.text().strip()
+        content = self.ui.txt_sp_content.toPlainText().strip()
 
         if not title:
-            show_warning(self, "알림", "프롬프트 제목을 입력해 주세요.")
+            show_warning(self, "알림", "System Prompt 제목을 입력해 주세요.")
             return
         if not content:
-            show_warning(self, "알림", "프롬프트 내용을 입력해 주세요.")
+            show_warning(self, "알림", "System Prompt 내용을 입력해 주세요.")
             return
 
-        if self._prompt_edit_mode == 'new':
-            new_prompt = self.prompt_manager.create_prompt(title, content)
-            self.current_prompt_id = new_prompt['id']
-        elif self._prompt_edit_mode == 'edit' and self.current_prompt_id:
-            self.prompt_manager.update_prompt(self.current_prompt_id, title, content)
+        if self._sp_edit_mode == 'new':
+            new_sp = self.sp_manager.create_system_prompt(title, content)
+            self.current_sp_id = new_sp['id']
+        elif self._sp_edit_mode == 'edit' and self.current_sp_id:
+            self.sp_manager.update_system_prompt(self.current_sp_id, title, content)
 
-        self._prompt_edit_mode = None
-        self._load_prompt_list()
-        self._select_prompt_by_id(self.current_prompt_id)
-        self._set_prompt_edit_enabled(False)
+        self._sp_edit_mode = None
+        self._load_sp_list()
+        self._select_sp_by_id(self.current_sp_id)
+        self._set_sp_edit_enabled(False)
 
     # ── 14. AI Agent 변경 ──
 
@@ -385,14 +412,14 @@ class MainWindow(QMainWindow):
             show_warning(self, "알림", "먼저 진료 기록을 조회해 주세요.")
             return
 
-        if not self.current_prompt_id:
-            show_warning(self, "알림", "프롬프트를 선택해 주세요.")
+        if not self.current_sp_id:
+            show_warning(self, "알림", "System Prompt를 선택해 주세요.")
             return
 
-        # 선택된 프롬프트 가져오기
-        prompt = self.prompt_manager.get_prompt_by_id(self.current_prompt_id)
-        if not prompt:
-            show_warning(self, "알림", "프롬프트를 선택해 주세요.")
+        # 선택된 System Prompt 가져오기
+        sp = self.sp_manager.get_system_prompt_by_id(self.current_sp_id)
+        if not sp:
+            show_warning(self, "알림", "System Prompt를 선택해 주세요.")
             return
 
         self.ui.btn_enhance.setEnabled(False)
@@ -401,7 +428,7 @@ class MainWindow(QMainWindow):
 
         self._enhance_worker = EnhanceWorker(
             agent_type=self.current_ai_agent,
-            prompt_text=prompt['content'],
+            system_prompt_text=sp['content'],
             plain_note=self.current_plain_note,
         )
         self._enhance_worker.result.connect(self._on_enhance_result)
@@ -411,12 +438,22 @@ class MainWindow(QMainWindow):
 
     def _on_enhance_result(self, text: str):
         """Enhance 결과 수신"""
-        self.current_enhanced_text = text
-        self.ui.txt_enhanced_result.setPlainText(text)
-        app_logger.info(f"Enhance 완료 (길이: {len(text)})")
+        try:
+            normalized_text = self._validate_and_normalize_enhance_json(text)
+        except ValueError as e:
+            self.current_enhanced_text = ''
+            self.ui.txt_enhanced_result.clear()
+            show_error(self, "AI Enhance 오류", str(e))
+            app_logger.error(f"Enhance 결과 검증 실패: {e}")
+            return
+
+        self.current_enhanced_text = normalized_text
+        self.ui.txt_enhanced_result.setPlainText(normalized_text)
+        app_logger.info(f"Enhance 완료 (길이: {len(normalized_text)})")
 
     def _on_enhance_error(self, error_msg: str):
         """Enhance 오류"""
+        self._update_save_button_state()
         show_error(self, "AI Enhance 오류", error_msg)
         app_logger.error(f"Enhance 오류: {error_msg}")
 
@@ -433,6 +470,16 @@ class MainWindow(QMainWindow):
         if not enhanced_text:
             show_warning(self, "알림", "저장할 Enhance 결과가 없습니다.")
             return
+
+        try:
+            enhanced_text = self._validate_and_normalize_enhance_json(enhanced_text)
+        except ValueError as e:
+            show_error(self, "저장 오류", f"Enhance 결과 JSON 형식이 올바르지 않습니다.\n{e}")
+            app_logger.error(f"저장 전 Enhance JSON 검증 실패: {e}")
+            return
+
+        self.ui.txt_enhanced_result.setPlainText(enhanced_text)
+        self.current_enhanced_text = enhanced_text
 
         if not self.current_encounter_uuid:
             show_warning(self, "알림", "진료를 먼저 선택해 주세요.")
@@ -466,8 +513,12 @@ class MainWindow(QMainWindow):
 
     def _restore_save_button(self):
         """저장 버튼 복원"""
-        self.ui.btn_save_to_sigma.setEnabled(True)
         self.ui.btn_save_to_sigma.setText("시그마차트에 저장")
+        self._update_save_button_state()
+
+    def _on_enhanced_text_changed(self):
+        """Enhance 결과 편집 시 저장 가능 상태 갱신"""
+        self._update_save_button_state()
 
     # ━━━━━━ 내부 헬퍼 ━━━━━━
 
@@ -553,16 +604,95 @@ class MainWindow(QMainWindow):
             return nn_conf.openai_api_key or None
         return None
 
-    def _set_prompt_edit_enabled(self, enabled: bool):
-        """프롬프트 편집 영역 활성화/비활성화"""
-        self.ui.edit_prompt_title.setReadOnly(not enabled)
-        self.ui.txt_prompt_content.setReadOnly(not enabled)
-        self.ui.btn_prompt_save.setEnabled(enabled)
+    def _validate_and_normalize_enhance_json(self, text: str) -> str:
+        """Enhance 결과가 요구된 JSON 스키마인지 검증 후 정규화"""
+        try:
+            data = json.loads(text)
+        except json.JSONDecodeError as e:
+            raise ValueError(f"JSON 파싱 실패: {e.msg}") from e
 
-    def _select_prompt_by_id(self, prompt_id: str):
-        """프롬프트 ID로 목록에서 선택"""
-        for i in range(self.ui.list_prompts.count()):
-            item = self.ui.list_prompts.item(i)
-            if item and item.data(Qt.ItemDataRole.UserRole) == prompt_id:
-                self.ui.list_prompts.setCurrentRow(i)
+        if not isinstance(data, dict):
+            raise ValueError("최상위 결과는 JSON 객체여야 합니다.")
+
+        required_keys = ['subjective', 'objective', 'assessment', 'plan', 'metadata']
+        for key in required_keys:
+            if key not in data:
+                raise ValueError(f"필수 키 누락: {key}")
+
+        for key in ['subjective', 'objective', 'assessment', 'plan']:
+            if not isinstance(data[key], str):
+                raise ValueError(f"{key} 값은 문자열이어야 합니다.")
+
+        metadata = data['metadata']
+        if not isinstance(metadata, dict):
+            raise ValueError("metadata 값은 객체여야 합니다.")
+
+        if 'primary_diagnosis' not in metadata:
+            raise ValueError("metadata.primary_diagnosis 키가 필요합니다.")
+        if 'follow_up_needed' not in metadata:
+            raise ValueError("metadata.follow_up_needed 키가 필요합니다.")
+
+        if not isinstance(metadata['primary_diagnosis'], str):
+            raise ValueError("metadata.primary_diagnosis 값은 문자열이어야 합니다.")
+        if not isinstance(metadata['follow_up_needed'], bool):
+            raise ValueError("metadata.follow_up_needed 값은 boolean이어야 합니다.")
+
+        normalized = {
+            'subjective': data['subjective'],
+            'objective': data['objective'],
+            'assessment': data['assessment'],
+            'plan': data['plan'],
+            'metadata': {
+                'primary_diagnosis': metadata['primary_diagnosis'],
+                'follow_up_needed': metadata['follow_up_needed'],
+            },
+        }
+        return json.dumps(normalized, ensure_ascii=False, indent=2)
+
+    def _update_save_button_state(self):
+        """Enhance 결과 JSON 유효성에 따라 저장 버튼 상태 갱신"""
+        button = self.ui.btn_save_to_sigma
+        status_label = self.ui.lbl_enhanced_result_status
+        enhanced_text = self.ui.txt_enhanced_result.toPlainText().strip()
+
+        if self._save_worker is not None and self._save_worker.isRunning():
+            button.setEnabled(False)
+            button.setToolTip("저장 중입니다.")
+            status_label.setText("저장 중입니다.")
+            status_label.setStyleSheet("color: #8a6d3b;")
+            return
+
+        if not enhanced_text:
+            button.setEnabled(False)
+            button.setToolTip("저장할 Enhance 결과가 없습니다.")
+            status_label.setText("저장할 Enhance 결과가 없습니다.")
+            status_label.setStyleSheet("color: #666666;")
+            return
+
+        try:
+            self._validate_and_normalize_enhance_json(enhanced_text)
+        except ValueError as e:
+            button.setEnabled(False)
+            button.setToolTip(f"유효하지 않은 JSON: {e}")
+            status_label.setText(f"JSON 검증 실패: {e}")
+            status_label.setStyleSheet("color: #c62828;")
+            return
+
+        button.setEnabled(True)
+        button.setToolTip("")
+        status_label.setText("유효한 JSON입니다. 저장할 수 있습니다.")
+        status_label.setStyleSheet("color: #2e7d32;")
+
+    def _set_sp_edit_enabled(self, enabled: bool):
+        """System Prompt 편집 영역 활성화/비활성화"""
+        self.ui.edit_sp_title.setReadOnly(not enabled)
+        self.ui.txt_sp_content.setReadOnly(not enabled)
+        self.ui.btn_sp_save.setEnabled(enabled)
+
+    def _select_sp_by_id(self, sp_id: str):
+        """System Prompt ID로 목록에서 선택"""
+        for i in range(self.ui.list_system_prompts.count()):
+            item = self.ui.list_system_prompts.item(i)
+            if item and item.data(Qt.ItemDataRole.UserRole) == sp_id:
+                self.ui.list_system_prompts.setCurrentRow(i)
                 return

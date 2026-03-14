@@ -15,17 +15,17 @@ class EnhanceWorker(QThread):
     result = Signal(str)   # 성공 시 결과 텍스트
     error = Signal(str)    # 오류 시 에러 메시지
 
-    def __init__(self, agent_type: str, prompt_text: str,
+    def __init__(self, agent_type: str, system_prompt_text: str,
                  plain_note: str, parent=None):
         super().__init__(parent)
         self.agent_type = agent_type
-        self.prompt_text = prompt_text
+        self.system_prompt_text = system_prompt_text
         self.plain_note = plain_note
 
     def run(self):
         try:
             text = AiService.enhance(
-                self.agent_type, self.prompt_text, self.plain_note,
+                self.agent_type, self.system_prompt_text, self.plain_note,
             )
             self.result.emit(text)
         except Exception as e:

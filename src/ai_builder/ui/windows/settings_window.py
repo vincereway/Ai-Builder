@@ -178,8 +178,12 @@ class SettingsWindow(QDialog):
 
     def _on_server_not_found(self, message: str = "네트워크에서 시그마차트 서버를 찾지 못했습니다."):
         """서버 미발견"""
-        self._connection_status_service.set_status(False)
+        self.server_ip = None
+        self.ui.edit_sigma_server_ip.clear()
+        nn_conf.save_config('SIGMA_SERVER_IP', '')
+        self._connection_status_service.set_status(None)
         self._restore_search_button()
+        self._emit_settings_changed()
         show_info(self, "검색 결과", message)
 
     def _on_scan_error(self, error_msg: str):

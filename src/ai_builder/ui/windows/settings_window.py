@@ -16,6 +16,7 @@ from PySide6.QtWidgets import QComboBox, QDialog, QLabel, QPushButton, QStyle
 
 from ai_builder.ui.generated.settings_window_ui import Ui_SettingsWindow
 from ai_builder.services.connection_status_service import get_connection_status_service
+from ai_builder.services.network_scanner import NetworkScanner
 from ai_builder.workers.scan_worker import ScanWorker
 from ai_builder.constants.enums import (
     DEFAULT_GEMINI_MODEL,
@@ -144,12 +145,20 @@ class SettingsWindow(QDialog):
         self._update_connection_status(status)
 
     def _on_search_server_clicked(self):
-        """[검색하기] 클릭 — 네트워크 스캔 시작"""
+        """[검색하기] 클릭 — 입력 IP 우선 확인, 없으면 네트워크 스캔"""
         if self._scan_worker and self._scan_worker.isRunning():
             return
 
+        target_ip = self.ui.edit_sigma_server_ip.text().strip()
         self.ui.btn_sigma_search.setEnabled(False)
         self.ui.btn_sigma_search.setText("검색 중...")
+
+        if target_ip:
+            if NetworkScanner.check_host(target_ip):
+                self._on_server_found(target_ip)
+                return
+
+            app_logger.info(f"입력 IP 확인 실패, 전체 네트워크 스캔으로 전환: {target_ip}")
 
         self._scan_worker = ScanWorker()
         self._scan_worker.found.connect(self._on_server_found)
@@ -167,11 +176,11 @@ class SettingsWindow(QDialog):
         self._emit_settings_changed()
         app_logger.info(f"시그마 서버 검색 성공: {ip}")
 
-    def _on_server_not_found(self):
+    def _on_server_not_found(self, message: str = "네트워크에서 시그마차트 서버를 찾지 못했습니다."):
         """서버 미발견"""
         self._connection_status_service.set_status(False)
         self._restore_search_button()
-        show_info(self, "검색 결과", "네트워크에서 시그마차트 서버를 찾지 못했습니다.")
+        show_info(self, "검색 결과", message)
 
     def _on_scan_error(self, error_msg: str):
         """스캔 오류"""

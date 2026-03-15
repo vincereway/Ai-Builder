@@ -11,6 +11,7 @@ import uuid
 from datetime import datetime
 from pathlib import Path
 
+from ai_builder.constants.prompt_contract import strip_enhance_schema_contract
 from conf.nnconf.nnconfig import nn_conf
 from conf.nnconf.nnlogger import app_logger
 
@@ -21,7 +22,6 @@ class SystemPromptManager:
     def __init__(self):
         self._db_path = nn_conf.settings_db_path
         self._seed_file_path = self._resolve_seed_file_path()
-        self._legacy_file_paths = self._resolve_legacy_file_paths()
 
         self._initialize_table()
         self._bootstrap_system_prompts()
@@ -34,24 +34,6 @@ class SystemPromptManager:
         if dev_source_path.exists():
             return dev_source_path
         return bundled_path
-
-    def _resolve_legacy_file_paths(self) -> list[Path]:
-        """이전 JSON 저장소 후보 경로 반환"""
-        candidates = [
-            nn_conf.data_path / 'system_prompts.json',
-            nn_conf.project_path / 'src' / 'ai_builder' / 'data' / 'system_prompts.json',
-            nn_conf.root_path / 'ai_builder' / 'data' / 'system_prompts.json',
-        ]
-
-        unique_paths = []
-        seen = set()
-        for path in candidates:
-            normalized = str(path.resolve()) if path.exists() else str(path)
-            if normalized in seen:
-                continue
-            seen.add(normalized)
-            unique_paths.append(path)
-        return unique_paths
 
     def _connect(self) -> sqlite3.Connection:
         """System Prompt 저장용 SQLite 연결 반환"""
@@ -83,13 +65,7 @@ class SystemPromptManager:
             app_logger.error(f"System Prompt 테이블 초기화 실패: {e}")
 
     def _bootstrap_system_prompts(self) -> None:
-        """최초 실행 시 legacy JSON 또는 시드 JSON에서 초기 데이터 적재"""
-        if self._count_prompts() == 0:
-            legacy_prompts = self._load_prompts_from_legacy_json()
-            if legacy_prompts:
-                self._insert_prompts(legacy_prompts)
-                app_logger.info(f"System Prompt 초기 데이터 적재 완료: {len(legacy_prompts)}건")
-
+        """최초 실행 시 시드 JSON의 기본 Prompt를 DB에 보충"""
         self._ensure_seed_prompts()
 
     def _count_prompts(self) -> int:
@@ -101,14 +77,6 @@ class SystemPromptManager:
         except sqlite3.Error as e:
             app_logger.error(f"System Prompt 개수 조회 실패: {e}")
             return 0
-
-    def _load_prompts_from_legacy_json(self) -> list[dict]:
-        """기존 JSON 저장소가 있으면 초기 데이터로 사용"""
-        for path in self._legacy_file_paths:
-            prompts = self._load_prompts_from_json(path)
-            if prompts:
-                return prompts
-        return []
 
     def _load_prompts_from_json(self, file_path: Path) -> list[dict]:
         """JSON 파일에서 System Prompt 목록 로드"""
@@ -147,7 +115,7 @@ class SystemPromptManager:
         return {
             'id': prompt_id,
             'title': str(prompt.get('title') or ''),
-            'content': str(prompt.get('content') or ''),
+            'content': strip_enhance_schema_contract(prompt.get('content') or ''),
             'order': display_order,
             'created_dt': str(prompt.get('created_dt') or now),
             'updated_dt': str(prompt.get('updated_dt') or now),
@@ -240,7 +208,7 @@ class SystemPromptManager:
         new_prompt = {
             'id': str(uuid.uuid4()),
             'title': title,
-            'content': content,
+            'content': strip_enhance_schema_contract(content),
             'order': len(prompts),
             'created_dt': now,
             'updated_dt': now,
@@ -261,7 +229,7 @@ class SystemPromptManager:
                     SET title = ?, content = ?, updated_dt = ?
                     WHERE id = ?
                     """,
-                    (title, content, updated_dt, system_prompt_id),
+                    (title, strip_enhance_schema_contract(content), updated_dt, system_prompt_id),
                 )
                 conn.commit()
         except sqlite3.Error as e:

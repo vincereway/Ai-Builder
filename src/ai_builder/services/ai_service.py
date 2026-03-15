@@ -11,6 +11,7 @@ from ai_builder.constants.enums import (
     OPENAI_RESPONSES_URL, OPENAI_MODELS_URL, DEFAULT_OPENAI_MODEL,
     AI_AGENT_GEMINI, AI_AGENT_OPENAI,
 )
+from ai_builder.constants.prompt_contract import compose_enhance_system_prompt
 from conf.nnconf.nnconfig import nn_conf
 from conf.nnconf.nnlogger import ai_logger
 
@@ -57,12 +58,14 @@ class AiService:
         if not api_key:
             raise RuntimeError('Gemini API 키가 설정되지 않았습니다.')
 
+        resolved_prompt_text = compose_enhance_system_prompt(prompt_text)
+
         model_id = nn_conf.gemini_model_id or DEFAULT_GEMINI_MODEL
         url = GEMINI_API_URL.format(model=model_id)
         params = {'key': api_key}
         body = {
             "system_instruction": {
-                "parts": [{"text": prompt_text}]
+                "parts": [{"text": resolved_prompt_text}]
             },
             "generationConfig": {
                 "responseMimeType": "application/json"
@@ -113,6 +116,8 @@ class AiService:
         if not api_key:
             raise RuntimeError('OpenAI API 키가 설정되지 않았습니다.')
 
+        resolved_prompt_text = compose_enhance_system_prompt(prompt_text)
+
         model_id = nn_conf.openai_model_id or DEFAULT_OPENAI_MODEL
 
         headers = {
@@ -121,7 +126,7 @@ class AiService:
         }
         body = {
             "model": model_id,
-            "instructions": prompt_text,
+            "instructions": resolved_prompt_text,
             "input": plain_note,
         }
 

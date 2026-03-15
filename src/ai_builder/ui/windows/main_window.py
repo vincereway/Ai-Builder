@@ -7,11 +7,12 @@
 
 import json
 
-from PySide6.QtCore import Qt, QDate
+from PySide6.QtCore import Qt, QDate, QTimer
 from PySide6.QtWidgets import QMainWindow, QListWidgetItem
 
 from ai_builder.ui.generated.main_window_ui import Ui_MainWindow
 from ai_builder.ui.windows.settings_window import SettingsWindow
+from ai_builder.services.connection_status_service import get_connection_status_service
 from ai_builder.services.sigma_api import SigmaApiClient
 from ai_builder.services.system_prompt_manager import SystemPromptManager
 from ai_builder.workers.encounter_worker import EncounterWorker
@@ -59,12 +60,15 @@ class MainWindow(QMainWindow):
 
         # 설정 윈도우 참조
         self._settings_window: SettingsWindow | None = None
+        self._initial_connection_check_pending: bool = True
+        self._connection_status_service = get_connection_status_service()
 
         # 초기화
         self._load_initial_state()
         self._setup_connections()
+        self._connection_status_service.status_changed.connect(self._on_connection_status_changed)
         self._sync_initial_sp_selection()
-        self._load_initial_encounters_if_available()
+        QTimer.singleShot(0, self._connection_status_service.refresh)
 
     # ── 1. 초기 상태 로드 ──
 
@@ -91,8 +95,11 @@ class MainWindow(QMainWindow):
         # Enhance 결과 저장 버튼은 유효한 JSON이 있을 때만 활성화
         self._update_save_button_state()
 
-        # 앱 시작 시에는 경고창 없이 저장된 IP로 헬스체크만 수행
-        self._refresh_connection_state_silently()
+        # 앱 시작 시 연결 상태는 중앙 서비스 값 사용
+        initial_status = self._connection_status_service.status
+        if initial_status is None and self.current_server_ip:
+            initial_status = 'checking'
+        self._update_connection_status(initial_status)
 
     # ── 2. 시그널-슬롯 연결 ──
 
@@ -582,7 +589,6 @@ class MainWindow(QMainWindow):
 
         self._settings_window = SettingsWindow(self)
         self._settings_window.settings_changed.connect(self._on_settings_changed)
-        self._settings_window.connection_state_changed.connect(self._on_connection_state_changed)
         self._settings_window.exec()
 
     def _on_settings_changed(self, data: dict):
@@ -591,34 +597,30 @@ class MainWindow(QMainWindow):
         self.current_server_ip = nn_conf.sigma_server_ip or None
         self.current_sigma_api_key = nn_conf.sigma_api_key or None
         self._refresh_ai_agent_combo()
-        self._refresh_connection_state_silently()
+        self._connection_status_service.refresh()
 
-    def _on_connection_state_changed(self, is_alive: bool):
-        """설정 뷰에서 연결 상태 변경 시 메인 뷰 동기화"""
-        self.connection_alive = is_alive
-        self._update_connection_status(is_alive)
+    def _on_connection_status_changed(self, status: bool | str | None):
+        """중앙 연결 상태 변경 시 메인 뷰 동기화"""
+        self.connection_alive = bool(status is True)
+        self._update_connection_status(status)
 
-    def _update_connection_status(self, is_alive: bool | None):
+        if self._initial_connection_check_pending and status != 'checking':
+            self._initial_connection_check_pending = False
+            if status is True:
+                self._load_initial_encounters_if_available()
+
+    def _update_connection_status(self, is_alive: bool | str | None):
         """메인 뷰 연결 상태 아이콘/텍스트 갱신"""
         if is_alive is None:
             icon, text = "⚪", "미설정"
+        elif is_alive == 'checking':
+            icon, text = "🟡", "확인 중"
         elif is_alive:
             icon, text = "🟢", "정상"
         else:
             icon, text = "🔴", "끊김"
         self.ui.lbl_connection_status_icon.setText(icon)
         self.ui.lbl_connection_status_text.setText(text)
-
-    def _refresh_connection_state_silently(self):
-        """경고창 없이 현재 설정 기준 연결 상태를 갱신"""
-        if not self.current_server_ip:
-            self.connection_alive = False
-            self._update_connection_status(None)
-            return
-
-        client = SigmaApiClient(self.current_server_ip, self.current_sigma_api_key or '')
-        self.connection_alive = client.health_check()
-        self._update_connection_status(self.connection_alive)
 
     def _load_initial_encounters_if_available(self):
         """앱 시작 직후 오늘 날짜 진료 목록 자동 조회"""
@@ -636,7 +638,7 @@ class MainWindow(QMainWindow):
         )
         if any(marker in error_msg for marker in disconnect_markers):
             self.connection_alive = False
-            self._update_connection_status(False)
+            self._connection_status_service.set_status(False)
 
     def _create_api_client(self) -> SigmaApiClient | None:
         """현재 설정으로 SigmaApiClient 생성"""

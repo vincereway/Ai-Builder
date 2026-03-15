@@ -15,6 +15,7 @@ from PySide6.QtGui import QColor, QIcon, QPainter, QPixmap
 from PySide6.QtWidgets import QComboBox, QDialog, QLabel, QPushButton, QStyle
 
 from ai_builder.ui.generated.settings_window_ui import Ui_SettingsWindow
+from ai_builder.services.connection_status_service import get_connection_status_service
 from ai_builder.workers.scan_worker import ScanWorker
 from ai_builder.constants.enums import (
     DEFAULT_GEMINI_MODEL,
@@ -35,7 +36,6 @@ class SettingsWindow(QDialog):
     """설정 다이얼로그"""
 
     settings_changed = Signal(dict)
-    connection_state_changed = Signal(bool)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -52,9 +52,11 @@ class SettingsWindow(QDialog):
         self._is_loading_openai_models: bool = False
 
         self._scan_worker: ScanWorker | None = None
+        self._connection_status_service = get_connection_status_service()
 
         self._load_initial_config()
         self._setup_connections()
+        self._connection_status_service.status_changed.connect(self._on_connection_status_changed)
         self._load_model_lists_if_available()
 
     def _load_initial_config(self):
@@ -84,10 +86,10 @@ class SettingsWindow(QDialog):
         )
 
         self.server_ip = nn_conf.sigma_server_ip or None
-        if self.server_ip:
-            self._check_server_health(self.server_ip)
-        else:
-            self._update_connection_status(None)
+        initial_status = self._connection_status_service.status
+        if initial_status is None and self.server_ip:
+            initial_status = 'checking'
+        self._update_connection_status(initial_status)
 
     def _setup_connections(self):
         """시그널-슬롯 연결"""
@@ -104,18 +106,27 @@ class SettingsWindow(QDialog):
         self.ui.btn_settings_close.clicked.connect(self.close)
 
     def _load_model_lists_if_available(self):
-        """저장된 API 키가 있으면 모델 목록 자동 조회"""
-        if nn_conf.gemini_api_key:
+        """저장된 모델 목록이 있으면 즉시 표시, 없으면 최초 1회 조회"""
+        if nn_conf.gemini_model_list:
+            self._load_cached_gemini_model_list()
+        elif nn_conf.gemini_api_key:
             self._refresh_gemini_model_list()
-        if nn_conf.openai_api_key:
+
+        if nn_conf.openai_model_list:
+            self._load_cached_openai_model_list()
+        elif nn_conf.openai_api_key:
             self._refresh_openai_model_list()
 
-    def _update_connection_status(self, is_alive: bool | None):
+    def _update_connection_status(self, is_alive: bool | str | None):
         """연결 상태 아이콘/텍스트 갱신"""
         if is_alive is None:
             icon = self._create_status_dot_icon('#94a3b8')
             text = "연결 상태: 미설정"
             role = 'neutral'
+        elif is_alive == 'checking':
+            icon = self._create_status_dot_icon('#f59e0b')
+            text = "연결 상태: 확인 중"
+            role = 'warning'
         elif is_alive:
             icon = self._create_status_dot_icon('#16a34a')
             text = "연결 상태: 정상"
@@ -128,8 +139,9 @@ class SettingsWindow(QDialog):
         self.ui.lbl_settings_connection_status_icon.setPixmap(icon.pixmap(14, 14))
         self._set_status_label(self.ui.lbl_settings_connection_status_text, text, role)
 
-        if is_alive is not None:
-            self.connection_state_changed.emit(is_alive)
+    def _on_connection_status_changed(self, status: bool | str | None):
+        """중앙 연결 상태 변경 시 설정 뷰 동기화"""
+        self._update_connection_status(status)
 
     def _on_search_server_clicked(self):
         """[검색하기] 클릭 — 네트워크 스캔 시작"""
@@ -150,14 +162,14 @@ class SettingsWindow(QDialog):
         self.server_ip = ip
         self.ui.edit_sigma_server_ip.setText(ip)
         nn_conf.save_config('SIGMA_SERVER_IP', ip)
-        self._update_connection_status(True)
+        self._connection_status_service.refresh()
         self._restore_search_button()
         self._emit_settings_changed()
         app_logger.info(f"시그마 서버 검색 성공: {ip}")
 
     def _on_server_not_found(self):
         """서버 미발견"""
-        self._update_connection_status(False)
+        self._connection_status_service.set_status(False)
         self._restore_search_button()
         show_info(self, "검색 결과", "네트워크에서 시그마차트 서버를 찾지 못했습니다.")
 
@@ -204,7 +216,7 @@ class SettingsWindow(QDialog):
                 self.sigma_api_key_valid = True
                 nn_conf.save_config('SIGMA_API_KEY', api_key)
                 self._set_status_label(self.ui.lbl_sigma_api_status, "정상", 'success')
-                self._update_connection_status(True)
+                self._connection_status_service.refresh()
                 self._emit_settings_changed()
                 app_logger.info("Sigma API 키 검증 성공")
             elif resp.status_code == 401:
@@ -216,7 +228,7 @@ class SettingsWindow(QDialog):
         except requests.ConnectionError:
             self.sigma_api_key_valid = False
             self._set_status_label(self.ui.lbl_sigma_api_status, "서버에 연결할 수 없습니다", 'danger')
-            self._update_connection_status(False)
+            self._connection_status_service.set_status(False)
         except Exception as e:
             self.sigma_api_key_valid = False
             self._set_status_label(self.ui.lbl_sigma_api_status, str(e)[:40], 'danger')
@@ -321,6 +333,7 @@ class SettingsWindow(QDialog):
                 DEFAULT_GEMINI_MODEL,
             )
             self._populate_model_combo(self.ui.combo_gemini_model, model_ids, selected_model_id)
+            nn_conf.save_config('GEMINI_MODEL_LIST', model_ids)
             nn_conf.save_config('GEMINI_MODEL_ID', selected_model_id)
             status_text = f"{len(model_ids)}개 모델 조회됨, 최신순 정렬"
             if api_key_validated:
@@ -380,6 +393,7 @@ class SettingsWindow(QDialog):
                 DEFAULT_OPENAI_MODEL,
             )
             self._populate_model_combo(self.ui.combo_openai_model, model_ids, selected_model_id)
+            nn_conf.save_config('OPENAI_MODEL_LIST', model_ids)
             nn_conf.save_config('OPENAI_MODEL_ID', selected_model_id)
             status_text = f"{len(model_ids)}개 모델 조회됨, 최신순 정렬"
             if api_key_validated:
@@ -428,6 +442,32 @@ class SettingsWindow(QDialog):
         self._apply_stylesheet()
         self.ui.lbl_settings_connection_status_icon.setFixedSize(14, 14)
         self._set_status_label(self.ui.lbl_sigma_api_status, '', 'neutral')
+
+    def _load_cached_gemini_model_list(self):
+        """저장된 Gemini 모델 목록을 즉시 표시"""
+        model_ids = self._sort_gemini_model_ids(self._dedupe_preserve_order(nn_conf.gemini_model_list))
+        if not model_ids:
+            return
+        selected_model_id = self._resolve_preferred_model(
+            model_ids,
+            nn_conf.gemini_model_id,
+            DEFAULT_GEMINI_MODEL,
+        )
+        self._populate_model_combo(self.ui.combo_gemini_model, model_ids, selected_model_id)
+        self._set_status_label(self.ui.lbl_gemini_model_status, f"저장된 목록 {len(model_ids)}개 불러옴, 최신순 정렬", 'info')
+
+    def _load_cached_openai_model_list(self):
+        """저장된 OpenAI 모델 목록을 즉시 표시"""
+        model_ids = self._dedupe_preserve_order(nn_conf.openai_model_list)
+        if not model_ids:
+            return
+        selected_model_id = self._resolve_preferred_model(
+            model_ids,
+            nn_conf.openai_model_id,
+            DEFAULT_OPENAI_MODEL,
+        )
+        self._populate_model_combo(self.ui.combo_openai_model, model_ids, selected_model_id)
+        self._set_status_label(self.ui.lbl_openai_model_status, f"저장된 목록 {len(model_ids)}개 불러옴, 최신순 정렬", 'info')
 
     def _apply_widget_roles(self):
         """버튼 역할 속성 지정"""
@@ -667,21 +707,6 @@ class SettingsWindow(QDialog):
             'selected_ai_agent': nn_conf.selected_ai_agent,
         }
         self.settings_changed.emit(data)
-
-    def _check_server_health(self, ip: str):
-        """저장된 IP로 즉시 Health Check"""
-        url = f"https://{ip}:{nn_conf.sigma_server_port}/health/simple/"
-        try:
-            resp = requests.get(
-                url,
-                timeout=nn_conf.request_timeout_seconds,
-                verify=nn_conf.get_sigma_ssl_verify(),
-            )
-            is_alive = resp.status_code == 200 and resp.json().get('status') == 'ok'
-        except Exception:
-            is_alive = False
-
-        self._update_connection_status(is_alive)
 
     @staticmethod
     def _dedupe_preserve_order(values: list[str]) -> list[str]:

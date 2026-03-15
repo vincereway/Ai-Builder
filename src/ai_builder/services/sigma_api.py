@@ -50,11 +50,12 @@ class SigmaApiClient:
             pass
         return HTTP_ERROR_MESSAGES.get(resp.status_code, f"HTTP {resp.status_code}")
 
-    def health_check(self) -> bool:
+    def health_check(self, timeout_seconds: float | None = None) -> bool:
         """간단 헬스체크"""
         url = f"{self.base_url}{HEALTH_SIMPLE_URL}"
         try:
-            resp = requests.get(url, timeout=self.timeout, verify=self.verify)
+            timeout_value = timeout_seconds if timeout_seconds is not None else self.timeout
+            resp = requests.get(url, timeout=timeout_value, verify=self.verify)
             return resp.status_code == 200 and resp.json().get('status') == 'ok'
         except Exception as e:
             network_logger.debug(f"Health Check 실패: {e}")

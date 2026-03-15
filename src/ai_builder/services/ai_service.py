@@ -7,8 +7,8 @@ Gemini, OpenAI API를 requests로 직접 호출합니다.
 import requests
 
 from ai_builder.constants.enums import (
-    GEMINI_API_URL, GEMINI_MODEL,
-    OPENAI_RESPONSES_URL, OPENAI_MODELS_URL, OPENAI_MODEL,
+    GEMINI_API_URL, DEFAULT_GEMINI_MODEL,
+    OPENAI_RESPONSES_URL, OPENAI_MODELS_URL, DEFAULT_OPENAI_MODEL,
     AI_AGENT_GEMINI, AI_AGENT_OPENAI,
 )
 from conf.nnconf.nnconfig import nn_conf
@@ -21,7 +21,8 @@ class AiService:
     @staticmethod
     def validate_gemini_key(api_key: str) -> bool:
         """Gemini API 키 유효성 검증"""
-        url = GEMINI_API_URL.format(model=GEMINI_MODEL)
+        model_id = nn_conf.gemini_model_id or DEFAULT_GEMINI_MODEL
+        url = GEMINI_API_URL.format(model=model_id)
         params = {'key': api_key}
         body = {"contents": [{"parts": [{"text": "Hi"}]}]}
         try:
@@ -56,11 +57,15 @@ class AiService:
         if not api_key:
             raise RuntimeError('Gemini API 키가 설정되지 않았습니다.')
 
-        url = GEMINI_API_URL.format(model=GEMINI_MODEL)
+        model_id = nn_conf.gemini_model_id or DEFAULT_GEMINI_MODEL
+        url = GEMINI_API_URL.format(model=model_id)
         params = {'key': api_key}
         body = {
             "system_instruction": {
                 "parts": [{"text": prompt_text}]
+            },
+            "generationConfig": {
+                "responseMimeType": "application/json"
             },
             "contents": [
                 {
@@ -70,7 +75,7 @@ class AiService:
             ]
         }
 
-        ai_logger.info(f"Gemini API 호출 시작 (모델: {GEMINI_MODEL})")
+        ai_logger.info(f"Gemini API 호출 시작 (모델: {model_id})")
         resp = requests.post(url, json=body, params=params, timeout=60)
 
         if resp.status_code != 200:
@@ -108,17 +113,19 @@ class AiService:
         if not api_key:
             raise RuntimeError('OpenAI API 키가 설정되지 않았습니다.')
 
+        model_id = nn_conf.openai_model_id or DEFAULT_OPENAI_MODEL
+
         headers = {
             'Authorization': f'Bearer {api_key}',
             'Content-Type': 'application/json',
         }
         body = {
-            "model": OPENAI_MODEL,
+            "model": model_id,
             "instructions": prompt_text,
             "input": plain_note,
         }
 
-        ai_logger.info(f"OpenAI API 호출 시작 (모델: {OPENAI_MODEL})")
+        ai_logger.info(f"OpenAI API 호출 시작 (모델: {model_id})")
         resp = requests.post(OPENAI_RESPONSES_URL, headers=headers, json=body, timeout=60)
 
         if resp.status_code != 200:

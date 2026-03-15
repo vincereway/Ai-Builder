@@ -15,15 +15,16 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QDialog, QGridLayout, QGroupBox,
-    QHBoxLayout, QLabel, QLineEdit, QPushButton,
-    QSizePolicy, QSpacerItem, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QComboBox, QDialog, QGridLayout,
+    QGroupBox, QHBoxLayout, QLabel, QLineEdit,
+    QPushButton, QSizePolicy, QSpacerItem, QVBoxLayout,
+    QWidget)
 
 class Ui_SettingsWindow(object):
     def setupUi(self, SettingsWindow):
         if not SettingsWindow.objectName():
             SettingsWindow.setObjectName(u"SettingsWindow")
-        SettingsWindow.resize(620, 420)
+        SettingsWindow.resize(620, 461)
         SettingsWindow.setModal(True)
         self.verticalLayout = QVBoxLayout(SettingsWindow)
         self.verticalLayout.setObjectName(u"verticalLayout")
@@ -94,30 +95,46 @@ class Ui_SettingsWindow(object):
         self.gridLayout1.setObjectName(u"gridLayout1")
         self.btn_open_gemini_link = QPushButton(self.group_gemini)
         self.btn_open_gemini_link.setObjectName(u"btn_open_gemini_link")
-        self.btn_open_gemini_link.setFlat(True)
         self.btn_open_gemini_link.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.btn_open_gemini_link.setFlat(True)
 
-        self.gridLayout1.addWidget(self.btn_open_gemini_link, 0, 0, 1, 3)
+        self.gridLayout1.addWidget(self.btn_open_gemini_link, 0, 1, 1, 2)
 
-        self.label2 = QLabel(self.group_gemini)
-        self.label2.setObjectName(u"label2")
+        self.btn_gemini_model_refresh = QPushButton(self.group_gemini)
+        self.btn_gemini_model_refresh.setObjectName(u"btn_gemini_model_refresh")
 
-        self.gridLayout1.addWidget(self.label2, 1, 0, 1, 1)
+        self.gridLayout1.addWidget(self.btn_gemini_model_refresh, 2, 2, 1, 1)
+
+        self.lbl_gemini_model_status = QLabel(self.group_gemini)
+        self.lbl_gemini_model_status.setObjectName(u"lbl_gemini_model_status")
+        self.lbl_gemini_model_status.setWordWrap(True)
+
+        self.gridLayout1.addWidget(self.lbl_gemini_model_status, 3, 1, 1, 2)
 
         self.edit_gemini_api_key = QLineEdit(self.group_gemini)
         self.edit_gemini_api_key.setObjectName(u"edit_gemini_api_key")
 
         self.gridLayout1.addWidget(self.edit_gemini_api_key, 1, 1, 1, 1)
 
+        self.combo_gemini_model = QComboBox(self.group_gemini)
+        self.combo_gemini_model.setObjectName(u"combo_gemini_model")
+
+        self.gridLayout1.addWidget(self.combo_gemini_model, 2, 1, 1, 1)
+
+        self.lbl_gemini_model = QLabel(self.group_gemini)
+        self.lbl_gemini_model.setObjectName(u"lbl_gemini_model")
+
+        self.gridLayout1.addWidget(self.lbl_gemini_model, 2, 0, 1, 1)
+
         self.btn_gemini_api_key_save = QPushButton(self.group_gemini)
         self.btn_gemini_api_key_save.setObjectName(u"btn_gemini_api_key_save")
 
         self.gridLayout1.addWidget(self.btn_gemini_api_key_save, 1, 2, 1, 1)
 
-        self.lbl_gemini_api_status = QLabel(self.group_gemini)
-        self.lbl_gemini_api_status.setObjectName(u"lbl_gemini_api_status")
+        self.label2 = QLabel(self.group_gemini)
+        self.label2.setObjectName(u"label2")
 
-        self.gridLayout1.addWidget(self.lbl_gemini_api_status, 1, 3, 1, 1)
+        self.gridLayout1.addWidget(self.label2, 1, 0, 1, 1)
 
 
         self.verticalLayout.addWidget(self.group_gemini)
@@ -128,15 +145,31 @@ class Ui_SettingsWindow(object):
         self.gridLayout2.setObjectName(u"gridLayout2")
         self.btn_open_openai_link = QPushButton(self.group_openai)
         self.btn_open_openai_link.setObjectName(u"btn_open_openai_link")
-        self.btn_open_openai_link.setFlat(True)
         self.btn_open_openai_link.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.btn_open_openai_link.setFlat(True)
 
-        self.gridLayout2.addWidget(self.btn_open_openai_link, 0, 0, 1, 3)
+        self.gridLayout2.addWidget(self.btn_open_openai_link, 0, 1, 1, 2)
 
         self.label3 = QLabel(self.group_openai)
         self.label3.setObjectName(u"label3")
 
         self.gridLayout2.addWidget(self.label3, 1, 0, 1, 1)
+
+        self.lbl_openai_model_status = QLabel(self.group_openai)
+        self.lbl_openai_model_status.setObjectName(u"lbl_openai_model_status")
+        self.lbl_openai_model_status.setWordWrap(True)
+
+        self.gridLayout2.addWidget(self.lbl_openai_model_status, 3, 1, 1, 2)
+
+        self.btn_openai_model_refresh = QPushButton(self.group_openai)
+        self.btn_openai_model_refresh.setObjectName(u"btn_openai_model_refresh")
+
+        self.gridLayout2.addWidget(self.btn_openai_model_refresh, 2, 2, 1, 1)
+
+        self.lbl_openai_model = QLabel(self.group_openai)
+        self.lbl_openai_model.setObjectName(u"lbl_openai_model")
+
+        self.gridLayout2.addWidget(self.lbl_openai_model, 2, 0, 1, 1)
 
         self.edit_openai_api_key = QLineEdit(self.group_openai)
         self.edit_openai_api_key.setObjectName(u"edit_openai_api_key")
@@ -148,10 +181,10 @@ class Ui_SettingsWindow(object):
 
         self.gridLayout2.addWidget(self.btn_openai_api_key_save, 1, 2, 1, 1)
 
-        self.lbl_openai_api_status = QLabel(self.group_openai)
-        self.lbl_openai_api_status.setObjectName(u"lbl_openai_api_status")
+        self.combo_openai_model = QComboBox(self.group_openai)
+        self.combo_openai_model.setObjectName(u"combo_openai_model")
 
-        self.gridLayout2.addWidget(self.lbl_openai_api_status, 1, 3, 1, 1)
+        self.gridLayout2.addWidget(self.combo_openai_model, 2, 1, 1, 1)
 
 
         self.verticalLayout.addWidget(self.group_openai)
@@ -186,20 +219,24 @@ class Ui_SettingsWindow(object):
         self.btn_sigma_search.setText(QCoreApplication.translate("SettingsWindow", u"\uac80\uc0c9\ud558\uae30", None))
         self.label1.setText(QCoreApplication.translate("SettingsWindow", u"API \ud0a4:", None))
         self.edit_sigma_api_key.setPlaceholderText(QCoreApplication.translate("SettingsWindow", u"sigma_xxxxxxxxxxxxxxxxxxxx", None))
-        self.btn_sigma_api_key_save.setText(QCoreApplication.translate("SettingsWindow", u"\U0001f4be \U0000c800\U0000c7a5", None))
+        self.btn_sigma_api_key_save.setText(QCoreApplication.translate("SettingsWindow", u"\uc800\uc7a5", None))
         self.lbl_sigma_api_status.setText("")
         self.group_gemini.setTitle(QCoreApplication.translate("SettingsWindow", u"Gemini (Google AI)", None))
-        self.btn_open_gemini_link.setText(QCoreApplication.translate("SettingsWindow", u"\U0001f517 Google AI Studio\U0000b85c \U0000c774\U0000b3d9\U0000d558\U0000ae30", None))
-        self.label2.setText(QCoreApplication.translate("SettingsWindow", u"API \ud0a4:", None))
+        self.btn_open_gemini_link.setText(QCoreApplication.translate("SettingsWindow", u"Google AI Studio\ub85c \uc774\ub3d9\ud558\uae30", None))
+        self.btn_gemini_model_refresh.setText(QCoreApplication.translate("SettingsWindow", u"\ubaa8\ub378\ubaa9\ub85d \uac31\uc2e0\ud558\uae30", None))
+        self.lbl_gemini_model_status.setText("")
         self.edit_gemini_api_key.setPlaceholderText(QCoreApplication.translate("SettingsWindow", u"AIzaSy_xxxxxxxxxxxxxxxxx", None))
-        self.btn_gemini_api_key_save.setText(QCoreApplication.translate("SettingsWindow", u"\U0001f4be \U0000c800\U0000c7a5", None))
-        self.lbl_gemini_api_status.setText("")
+        self.lbl_gemini_model.setText(QCoreApplication.translate("SettingsWindow", u"\ubaa8\ub378:", None))
+        self.btn_gemini_api_key_save.setText(QCoreApplication.translate("SettingsWindow", u"\uc800\uc7a5", None))
+        self.label2.setText(QCoreApplication.translate("SettingsWindow", u"API \ud0a4:", None))
         self.group_openai.setTitle(QCoreApplication.translate("SettingsWindow", u"OpenAI GPT", None))
-        self.btn_open_openai_link.setText(QCoreApplication.translate("SettingsWindow", u"\U0001f517 OpenAI \U0000d50c\U0000b7ab\U0000d3fc \U0000c774\U0000b3d9\U0000d558\U0000ae30", None))
+        self.btn_open_openai_link.setText(QCoreApplication.translate("SettingsWindow", u"OpenAI \ud50c\ub7ab\ud3fc \uc774\ub3d9\ud558\uae30", None))
         self.label3.setText(QCoreApplication.translate("SettingsWindow", u"SECRET KEY:", None))
+        self.lbl_openai_model_status.setText("")
+        self.btn_openai_model_refresh.setText(QCoreApplication.translate("SettingsWindow", u"\ubaa8\ub378\ubaa9\ub85d \uac31\uc2e0\ud558\uae30", None))
+        self.lbl_openai_model.setText(QCoreApplication.translate("SettingsWindow", u"\ubaa8\ub378:", None))
         self.edit_openai_api_key.setPlaceholderText(QCoreApplication.translate("SettingsWindow", u"sk-xxxxxxxxxxxxxxxxxxxx", None))
-        self.btn_openai_api_key_save.setText(QCoreApplication.translate("SettingsWindow", u"\U0001f4be \U0000c800\U0000c7a5", None))
-        self.lbl_openai_api_status.setText("")
+        self.btn_openai_api_key_save.setText(QCoreApplication.translate("SettingsWindow", u"\uc800\uc7a5", None))
         self.btn_settings_close.setText(QCoreApplication.translate("SettingsWindow", u"\ub2eb\uae30", None))
     # retranslateUi
 

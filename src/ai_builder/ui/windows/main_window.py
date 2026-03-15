@@ -47,6 +47,7 @@ class MainWindow(QMainWindow):
 
         # 편집 모드 상태
         self._sp_edit_mode: str | None = None  # 'new' 또는 'edit'
+        self._sp_dirty: bool = False
 
         # 서비스
         self.sp_manager = SystemPromptManager()
@@ -62,6 +63,7 @@ class MainWindow(QMainWindow):
         # 초기화
         self._load_initial_state()
         self._setup_connections()
+        self._sync_initial_sp_selection()
         self._load_initial_encounters_if_available()
 
     # ── 1. 초기 상태 로드 ──
@@ -84,6 +86,7 @@ class MainWindow(QMainWindow):
 
         # System Prompt 편집 영역 비활성화
         self._set_sp_edit_enabled(False)
+        self._update_sp_editor_actions()
 
         # Enhance 결과 저장 버튼은 유효한 JSON이 있을 때만 활성화
         self._update_save_button_state()
@@ -112,7 +115,10 @@ class MainWindow(QMainWindow):
         self.ui.btn_sp_delete.clicked.connect(self._on_sp_delete_clicked)
         self.ui.btn_sp_move_up.clicked.connect(self._on_sp_move_up_clicked)
         self.ui.btn_sp_move_down.clicked.connect(self._on_sp_move_down_clicked)
+        self.ui.btn_sp_cancel.clicked.connect(self._on_sp_cancel_clicked)
         self.ui.btn_sp_save.clicked.connect(self._on_sp_save_clicked)
+        self.ui.edit_sp_title.textChanged.connect(self._on_sp_content_changed)
+        self.ui.txt_sp_content.textChanged.connect(self._on_sp_content_changed)
 
         # AI
         self.ui.combo_ai_agent.currentTextChanged.connect(self._on_ai_agent_changed)
@@ -141,6 +147,12 @@ class MainWindow(QMainWindow):
         self.ui.combo_ai_agent.blockSignals(False)
         self.current_ai_agent = self.ui.combo_ai_agent.currentData()
 
+    def _sync_initial_sp_selection(self):
+        """초기 로드된 System Prompt 선택 상태를 시그널 연결 이후 동기화"""
+        current_row = self.ui.list_system_prompts.currentRow()
+        if current_row >= 0:
+            self._on_sp_selected(current_row)
+
     # ── 4. System Prompt 목록 로드 ──
 
     def _load_sp_list(self):
@@ -151,6 +163,11 @@ class MainWindow(QMainWindow):
             item = QListWidgetItem(p['title'])
             item.setData(Qt.ItemDataRole.UserRole, p['id'])
             self.ui.list_system_prompts.addItem(item)
+
+        if self.current_sp_id:
+            self._select_sp_by_id(self.current_sp_id)
+        elif self.ui.list_system_prompts.count() > 0:
+            self.ui.list_system_prompts.setCurrentRow(0)
 
     # ── 5. 진료 목록 조회 ──
 
@@ -289,10 +306,12 @@ class MainWindow(QMainWindow):
         if sp:
             self.ui.edit_sp_title.setText(sp['title'])
             self.ui.txt_sp_content.setPlainText(sp['content'])
+            self._sp_dirty = False
 
         # 편집 모드가 아닌 경우 읽기 전용
         if not self._sp_edit_mode:
             self._set_sp_edit_enabled(False)
+        self._update_sp_editor_actions()
 
     # ── 8. System Prompt 신규 ──
 
@@ -302,8 +321,10 @@ class MainWindow(QMainWindow):
         self.current_sp_id = None
         self.ui.edit_sp_title.clear()
         self.ui.txt_sp_content.clear()
+        self._sp_dirty = False
         self._set_sp_edit_enabled(True)
         self.ui.edit_sp_title.setFocus()
+        self._update_sp_editor_actions()
 
     # ── 9. System Prompt 수정 ──
 
@@ -313,8 +334,27 @@ class MainWindow(QMainWindow):
             show_warning(self, "알림", "수정할 System Prompt를 선택해 주세요.")
             return
         self._sp_edit_mode = 'edit'
+        self._sp_dirty = False
         self._set_sp_edit_enabled(True)
         self.ui.edit_sp_title.setFocus()
+        self._update_sp_editor_actions()
+
+    def _on_sp_cancel_clicked(self):
+        """[취소] 클릭: 편집 내용 폐기 후 읽기 전용 복귀"""
+        self._sp_edit_mode = None
+        self._sp_dirty = False
+
+        if self.current_sp_id:
+            sp = self.sp_manager.get_system_prompt_by_id(self.current_sp_id)
+            if sp:
+                self.ui.edit_sp_title.setText(sp['title'])
+                self.ui.txt_sp_content.setPlainText(sp['content'])
+        else:
+            self.ui.edit_sp_title.clear()
+            self.ui.txt_sp_content.clear()
+
+        self._set_sp_edit_enabled(False)
+        self._update_sp_editor_actions()
 
     # ── 10. System Prompt 삭제 ──
 
@@ -330,7 +370,10 @@ class MainWindow(QMainWindow):
         self._load_sp_list()
         self.ui.edit_sp_title.clear()
         self.ui.txt_sp_content.clear()
+        self._sp_edit_mode = None
+        self._sp_dirty = False
         self._set_sp_edit_enabled(False)
+        self._update_sp_editor_actions()
 
     # ── 11. System Prompt 위로 이동 ──
 
@@ -373,9 +416,18 @@ class MainWindow(QMainWindow):
             self.sp_manager.update_system_prompt(self.current_sp_id, title, content)
 
         self._sp_edit_mode = None
+        self._sp_dirty = False
         self._load_sp_list()
         self._select_sp_by_id(self.current_sp_id)
         self._set_sp_edit_enabled(False)
+        self._update_sp_editor_actions()
+
+    def _on_sp_content_changed(self):
+        """System Prompt 편집 내용 변경 감지"""
+        if not self._sp_edit_mode:
+            return
+        self._sp_dirty = True
+        self._update_sp_editor_actions()
 
     # ── 14. AI Agent 변경 ──
 
@@ -687,7 +739,40 @@ class MainWindow(QMainWindow):
         """System Prompt 편집 영역 활성화/비활성화"""
         self.ui.edit_sp_title.setReadOnly(not enabled)
         self.ui.txt_sp_content.setReadOnly(not enabled)
-        self.ui.btn_sp_save.setEnabled(enabled)
+        self.ui.btn_sp_cancel.setVisible(enabled)
+        self.ui.btn_sp_cancel.setEnabled(enabled)
+        self.ui.btn_sp_save.setVisible(enabled)
+
+        # 편집 중에는 좌측 목록/버튼 비활성화
+        self.ui.list_system_prompts.setEnabled(not enabled)
+        self.ui.btn_sp_new.setEnabled(not enabled)
+        self.ui.btn_sp_edit.setEnabled(not enabled)
+        self.ui.btn_sp_delete.setEnabled(not enabled)
+        self.ui.btn_sp_move_up.setEnabled(not enabled)
+        self.ui.btn_sp_move_down.setEnabled(not enabled)
+
+    def _update_sp_editor_actions(self):
+        """System Prompt 편집 상태에 따라 액션 버튼과 상태 텍스트 갱신"""
+        is_editing = bool(self._sp_edit_mode)
+        is_dirty = self._sp_dirty
+
+        self.ui.btn_sp_save.setEnabled(is_editing and is_dirty)
+        self.ui.btn_sp_save.setVisible(is_editing)
+        self.ui.btn_sp_cancel.setEnabled(is_editing)
+        self.ui.btn_sp_cancel.setVisible(is_editing)
+        self.ui.btn_sp_save.setDefault(is_editing)
+        self.ui.btn_sp_save.setAutoDefault(is_editing)
+
+        if self._sp_edit_mode == 'new':
+            status_text = '새 System Prompt 작성 중'
+        elif self._sp_edit_mode == 'edit' and is_dirty:
+            status_text = '편집 중, 저장되지 않은 변경 사항 있음'
+        elif self._sp_edit_mode == 'edit':
+            status_text = '편집 중'
+        else:
+            status_text = '읽기 전용'
+
+        self.ui.lbl_sp_editor_status.setText(status_text)
 
     def _select_sp_by_id(self, sp_id: str):
         """System Prompt ID로 목록에서 선택"""

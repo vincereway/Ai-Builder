@@ -131,6 +131,24 @@
          <item>
           <widget class="QListWidget" name="list_encounters"/>
          </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <widget class="QPushButton" name="btn_enhance">
+             <property name="text">
+              <string>Enhance</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btn_save_to_sigma">
+             <property name="text">
+              <string>차트에 저장</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
         </layout>
        </item>
        <item>
@@ -152,13 +170,13 @@
            </property>
           </widget>
          </item>
-                 <item>
-                    <widget class="QLabel" name="lbl_enhanced_result_status">
-                     <property name="text">
-                        <string>저장할 Enhance 결과가 없습니다.</string>
-                     </property>
-                    </widget>
-                 </item>
+         <item>
+          <widget class="QLabel" name="lbl_enhanced_result_status">
+           <property name="text">
+            <string>저장할 Enhance 결과가 없습니다.</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
       </layout>
@@ -179,20 +197,6 @@
        </item>
        <item>
         <widget class="QComboBox" name="combo_ai_agent"/>
-       </item>
-       <item>
-        <widget class="QPushButton" name="btn_enhance">
-         <property name="text">
-          <string>Enhance</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="btn_save_to_sigma">
-         <property name="text">
-          <string>시그마차트에 저장</string>
-         </property>
-        </widget>
        </item>
       </layout>
      </widget>
@@ -282,6 +286,13 @@
          <item>
           <layout class="QHBoxLayout">
            <item>
+            <widget class="QLabel" name="lbl_sp_editor_status">
+             <property name="text">
+              <string>읽기 전용</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <spacer>
              <property name="orientation">
               <enum>Qt::Orientation::Horizontal</enum>
@@ -295,7 +306,26 @@
             </spacer>
            </item>
            <item>
+            <widget class="QPushButton" name="btn_sp_cancel">
+             <property name="minimumSize">
+              <size>
+               <width>96</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>취소</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QPushButton" name="btn_sp_save">
+             <property name="minimumSize">
+              <size>
+               <width>96</width>
+               <height>0</height>
+              </size>
+             </property>
              <property name="text">
               <string>저장</string>
              </property>

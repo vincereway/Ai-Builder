@@ -52,6 +52,8 @@ class Config:
         self.sigma_api_key: str = ''
         self.gemini_api_key: str = ''
         self.openai_api_key: str = ''
+        self.gemini_model_id: str = 'gemini-2.5-flash'
+        self.openai_model_id: str = 'gpt-5.4'
         self.selected_ai_agent: str = 'gemini'
         self.log_level: str = 'DEBUG'
         self.request_timeout_seconds: int = 10
@@ -87,6 +89,10 @@ class Config:
             self.gemini_api_key = str(data['GEMINI_API_KEY'] or '')
         if 'OPENAI_API_KEY' in data:
             self.openai_api_key = str(data['OPENAI_API_KEY'] or '')
+        if 'GEMINI_MODEL_ID' in data:
+            self.gemini_model_id = str(data['GEMINI_MODEL_ID'] or 'gemini-2.5-flash')
+        if 'OPENAI_MODEL_ID' in data:
+            self.openai_model_id = str(data['OPENAI_MODEL_ID'] or 'gpt-5.4')
         if 'SELECTED_AI_AGENT' in data:
             self.selected_ai_agent = str(data['SELECTED_AI_AGENT'] or 'gemini')
 

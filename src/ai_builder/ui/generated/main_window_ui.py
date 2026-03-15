@@ -110,6 +110,21 @@ class Ui_MainWindow(object):
 
         self.vboxLayout.addWidget(self.list_encounters)
 
+        self.horizontalLayout = QHBoxLayout()
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.btn_enhance = QPushButton(self.group_encounters)
+        self.btn_enhance.setObjectName(u"btn_enhance")
+
+        self.horizontalLayout.addWidget(self.btn_enhance)
+
+        self.btn_save_to_sigma = QPushButton(self.group_encounters)
+        self.btn_save_to_sigma.setObjectName(u"btn_save_to_sigma")
+
+        self.horizontalLayout.addWidget(self.btn_save_to_sigma)
+
+
+        self.vboxLayout.addLayout(self.horizontalLayout)
+
 
         self.hboxLayout1.addLayout(self.vboxLayout)
 
@@ -150,16 +165,6 @@ class Ui_MainWindow(object):
         self.combo_ai_agent.setObjectName(u"combo_ai_agent")
 
         self.hboxLayout2.addWidget(self.combo_ai_agent)
-
-        self.btn_enhance = QPushButton(self.group_ai)
-        self.btn_enhance.setObjectName(u"btn_enhance")
-
-        self.hboxLayout2.addWidget(self.btn_enhance)
-
-        self.btn_save_to_sigma = QPushButton(self.group_ai)
-        self.btn_save_to_sigma.setObjectName(u"btn_save_to_sigma")
-
-        self.hboxLayout2.addWidget(self.btn_save_to_sigma)
 
 
         self.verticalLayout_main.addWidget(self.group_ai)
@@ -242,12 +247,24 @@ class Ui_MainWindow(object):
 
         self.hboxLayout7 = QHBoxLayout()
         self.hboxLayout7.setObjectName(u"hboxLayout7")
+        self.lbl_sp_editor_status = QLabel(self.group_system_prompts)
+        self.lbl_sp_editor_status.setObjectName(u"lbl_sp_editor_status")
+
+        self.hboxLayout7.addWidget(self.lbl_sp_editor_status)
+
         self.spacerItem1 = QSpacerItem(0, 0, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.hboxLayout7.addItem(self.spacerItem1)
 
+        self.btn_sp_cancel = QPushButton(self.group_system_prompts)
+        self.btn_sp_cancel.setObjectName(u"btn_sp_cancel")
+        self.btn_sp_cancel.setMinimumSize(QSize(96, 0))
+
+        self.hboxLayout7.addWidget(self.btn_sp_cancel)
+
         self.btn_sp_save = QPushButton(self.group_system_prompts)
         self.btn_sp_save.setObjectName(u"btn_sp_save")
+        self.btn_sp_save.setMinimumSize(QSize(96, 0))
 
         self.hboxLayout7.addWidget(self.btn_sp_save)
 
@@ -279,13 +296,13 @@ class Ui_MainWindow(object):
         self.btn_next_date.setText(QCoreApplication.translate("MainWindow", u"\u25b6", None))
         self.btn_load_encounters.setText(QCoreApplication.translate("MainWindow", u"\uc870\ud68c", None))
         self.btn_go_today.setText(QCoreApplication.translate("MainWindow", u"\uc624\ub298\ub85c \uc774\ub3d9", None))
+        self.btn_enhance.setText(QCoreApplication.translate("MainWindow", u"Enhance", None))
+        self.btn_save_to_sigma.setText(QCoreApplication.translate("MainWindow", u"\ucc28\ud2b8\uc5d0 \uc800\uc7a5", None))
         self.txt_plain_note.setPlaceholderText(QCoreApplication.translate("MainWindow", u"\uc9c4\ub8cc \uae30\ub85d\uc774 \uc5ec\uae30\uc5d0 \ud45c\uc2dc\ub429\ub2c8\ub2e4", None))
         self.txt_enhanced_result.setPlaceholderText(QCoreApplication.translate("MainWindow", u"AI Enhance \uacb0\uacfc\uac00 \uc5ec\uae30\uc5d0 \ud45c\uc2dc\ub429\ub2c8\ub2e4", None))
         self.lbl_enhanced_result_status.setText(QCoreApplication.translate("MainWindow", u"\uc800\uc7a5\ud560 Enhance \uacb0\uacfc\uac00 \uc5c6\uc2b5\ub2c8\ub2e4.", None))
         self.group_ai.setTitle(QCoreApplication.translate("MainWindow", u"AI Agent", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"\ubaa8\ub378 \uc120\ud0dd:", None))
-        self.btn_enhance.setText(QCoreApplication.translate("MainWindow", u"Enhance", None))
-        self.btn_save_to_sigma.setText(QCoreApplication.translate("MainWindow", u"\uc2dc\uadf8\ub9c8\ucc28\ud2b8\uc5d0 \uc800\uc7a5", None))
         self.group_system_prompts.setTitle(QCoreApplication.translate("MainWindow", u"System Prompt", None))
         self.btn_sp_new.setText(QCoreApplication.translate("MainWindow", u"\uc2e0\uaddc", None))
         self.btn_sp_edit.setText(QCoreApplication.translate("MainWindow", u"\uc218\uc815", None))
@@ -294,6 +311,8 @@ class Ui_MainWindow(object):
         self.btn_sp_move_down.setText(QCoreApplication.translate("MainWindow", u"\u25bc \uc544\ub798", None))
         self.label1.setText(QCoreApplication.translate("MainWindow", u"\uc81c\ubaa9:", None))
         self.label2.setText(QCoreApplication.translate("MainWindow", u"\ub0b4\uc6a9:", None))
+        self.lbl_sp_editor_status.setText(QCoreApplication.translate("MainWindow", u"\uc77d\uae30 \uc804\uc6a9", None))
+        self.btn_sp_cancel.setText(QCoreApplication.translate("MainWindow", u"\ucde8\uc18c", None))
         self.btn_sp_save.setText(QCoreApplication.translate("MainWindow", u"\uc800\uc7a5", None))
     # retranslateUi
 

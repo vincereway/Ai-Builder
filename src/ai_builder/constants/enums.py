@@ -14,12 +14,13 @@ ENCOUNTERS_URL = "/external/v1/encounters"
 ENCOUNTER_DETAIL_URL = "/external/v1/encounters/{encounter_uuid}"
 EXTERNAL_NOTE_URL = "/external/v1/encounters/{encounter_uuid}/external-note"
 
-# AI 모델명
-GEMINI_MODEL = "gemini-3.1-pro-preview"
-OPENAI_MODEL = "gpt-5.4"
+# AI 기본 모델명
+DEFAULT_GEMINI_MODEL = "gemini-2.5-flash"
+DEFAULT_OPENAI_MODEL = "gpt-5.4"
 
 # AI API 엔드포인트
 GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+GEMINI_MODELS_URL = "https://generativelanguage.googleapis.com/v1beta/models"
 OPENAI_RESPONSES_URL = "https://api.openai.com/v1/responses"
 OPENAI_MODELS_URL = "https://api.openai.com/v1/models"
 

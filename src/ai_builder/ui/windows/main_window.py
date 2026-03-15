@@ -390,7 +390,7 @@ class MainWindow(QMainWindow):
             return
         self.sp_manager.move_up(self.current_sp_id)
         self._load_sp_list()
-        self._select_sp_by_id(self.current_sp_id)
+        self._restore_sp_selection(self.current_sp_id)
 
     # ── 12. System Prompt 아래로 이동 ──
 
@@ -400,7 +400,7 @@ class MainWindow(QMainWindow):
             return
         self.sp_manager.move_down(self.current_sp_id)
         self._load_sp_list()
-        self._select_sp_by_id(self.current_sp_id)
+        self._restore_sp_selection(self.current_sp_id)
 
     # ── 13. System Prompt 저장 ──
 
@@ -783,3 +783,21 @@ class MainWindow(QMainWindow):
             if item and item.data(Qt.ItemDataRole.UserRole) == sp_id:
                 self.ui.list_system_prompts.setCurrentRow(i)
                 return
+
+    def _restore_sp_selection(self, sp_id: str | None):
+        """이동 후에도 현재 선택/포커스가 유지되도록 복구"""
+        if not sp_id:
+            return
+
+        for i in range(self.ui.list_system_prompts.count()):
+            item = self.ui.list_system_prompts.item(i)
+            if not item or item.data(Qt.ItemDataRole.UserRole) != sp_id:
+                continue
+
+            self.ui.list_system_prompts.setCurrentItem(item)
+            item.setSelected(True)
+            self.ui.list_system_prompts.scrollToItem(item)
+            self.ui.list_system_prompts.setFocus()
+            self.current_sp_id = sp_id
+            self._on_sp_selected(i)
+            return

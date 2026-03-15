@@ -449,6 +449,8 @@ class MainWindow(QMainWindow):
 
     def _on_enhance_clicked(self):
         """[Enhance] 클릭"""
+        plain_note = self.ui.txt_plain_note.toPlainText().strip()
+
         # 사전 검증
         if not self.current_ai_agent:
             show_warning(self, "알림", "AI Agent를 선택해 주세요.")
@@ -467,8 +469,8 @@ class MainWindow(QMainWindow):
             show_warning(self, "알림", "시그마차트 서버에 연결되어 있지 않습니다.")
             return
 
-        if not self.current_plain_note:
-            show_warning(self, "알림", "먼저 진료 기록을 조회해 주세요.")
+        if not plain_note:
+            show_warning(self, "알림", "보강할 문서를 입력하거나 진료 기록을 조회해 주세요.")
             return
 
         if not self.current_sp_id:
@@ -484,11 +486,12 @@ class MainWindow(QMainWindow):
         self.ui.btn_enhance.setEnabled(False)
         self.ui.btn_enhance.setText("처리 중...")
         self.ui.txt_enhanced_result.clear()
+        self.current_plain_note = plain_note
 
         self._enhance_worker = EnhanceWorker(
             agent_type=self.current_ai_agent,
             system_prompt_text=sp['content'],
-            plain_note=self.current_plain_note,
+            plain_note=plain_note,
         )
         self._enhance_worker.result.connect(self._on_enhance_result)
         self._enhance_worker.error.connect(self._on_enhance_error)

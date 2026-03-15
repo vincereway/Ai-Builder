@@ -117,7 +117,6 @@ class Ui_MainWindow(object):
         self.vboxLayout1.setObjectName(u"vboxLayout1")
         self.txt_plain_note = QPlainTextEdit(self.group_encounters)
         self.txt_plain_note.setObjectName(u"txt_plain_note")
-        self.txt_plain_note.setReadOnly(True)
 
         self.vboxLayout1.addWidget(self.txt_plain_note)
 
@@ -303,7 +302,7 @@ class Ui_MainWindow(object):
         self.btn_next_date.setText(QCoreApplication.translate("MainWindow", u"\u25b6", None))
         self.btn_load_encounters.setText(QCoreApplication.translate("MainWindow", u"\uc870\ud68c", None))
         self.btn_go_today.setText(QCoreApplication.translate("MainWindow", u"\uc624\ub298\ub85c \uc774\ub3d9", None))
-        self.txt_plain_note.setPlaceholderText(QCoreApplication.translate("MainWindow", u"\uc9c4\ub8cc \uae30\ub85d\uc774 \uc5ec\uae30\uc5d0 \ud45c\uc2dc\ub429\ub2c8\ub2e4", None))
+        self.txt_plain_note.setPlaceholderText(QCoreApplication.translate("MainWindow", u"\ubcf4\uac15\ud560 \ubb38\uc11c\ub97c \ub123\uc5b4\uc8fc\uc138\uc694.", None))
         self.btn_enhance.setText(QCoreApplication.translate("MainWindow", u"Enhance", None))
         self.txt_enhanced_result.setPlaceholderText(QCoreApplication.translate("MainWindow", u"AI Enhance \uacb0\uacfc\uac00 \uc5ec\uae30\uc5d0 \ud45c\uc2dc\ub429\ub2c8\ub2e4", None))
         self.btn_save_to_sigma.setText(QCoreApplication.translate("MainWindow", u"\ucc28\ud2b8\uc5d0 \uc800\uc7a5", None))

@@ -137,11 +137,8 @@
         <layout class="QVBoxLayout">
          <item>
           <widget class="QPlainTextEdit" name="txt_plain_note">
-           <property name="readOnly">
-            <bool>true</bool>
-           </property>
            <property name="placeholderText">
-            <string>진료 기록이 여기에 표시됩니다</string>
+                              <string>보강할 문서를 넣어주세요.</string>
            </property>
           </widget>
          </item>

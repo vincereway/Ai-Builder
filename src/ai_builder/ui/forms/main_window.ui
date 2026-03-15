@@ -183,25 +183,6 @@
      </widget>
     </item>
     <item>
-     <widget class="QGroupBox" name="group_ai">
-      <property name="title">
-       <string>AI Agent</string>
-      </property>
-      <layout class="QHBoxLayout">
-       <item>
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>모델 선택:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QComboBox" name="combo_ai_agent"/>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item>
      <widget class="QGroupBox" name="group_system_prompts">
       <property name="title">
        <string>System Prompt</string>
@@ -209,6 +190,25 @@
       <layout class="QHBoxLayout">
        <item>
         <layout class="QVBoxLayout">
+            <item>
+            <widget class="QGroupBox" name="group_ai">
+             <property name="title">
+              <string>AI Agent</string>
+             </property>
+             <layout class="QVBoxLayout">
+              <item>
+               <widget class="QLabel" name="label_ai_agent">
+                <property name="text">
+                <string>모델 선택:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="combo_ai_agent"/>
+              </item>
+             </layout>
+            </widget>
+            </item>
          <item>
           <widget class="QListWidget" name="list_system_prompts"/>
          </item>

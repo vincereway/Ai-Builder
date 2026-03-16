@@ -1,0 +1,64 @@
+@echo off
+chcp 65001 >nul 2>&1
+setlocal enabledelayedexpansion
+
+echo ============================================================
+echo  Ai-Builder 빌드
+echo ============================================================
+echo.
+
+REM [1/4] Git 브랜치 표시
+echo [1/4] Git 브랜치 확인
+where git >nul 2>&1
+if %ERRORLEVEL% EQU 0 (
+    for /f "usebackq delims=" %%i in (`git rev-parse --abbrev-ref HEAD`) do set BRANCH=%%i
+)
+if defined BRANCH (
+    echo   현재 브랜치: %BRANCH%
+) else (
+    echo   Git 정보를 가져올 수 없습니다.
+)
+echo.
+
+REM [2/4] UI 컴파일
+echo [2/4] UI 컴파일
+python scripts\compile_ui.py
+if %ERRORLEVEL% NEQ 0 (
+    echo   ❌ UI 컴파일 실패
+    goto :error
+)
+echo.
+
+REM [3/4] PyInstaller 빌드
+echo [3/4] PyInstaller 빌드
+call scripts\build\build_ai_builder.bat
+if %ERRORLEVEL% NEQ 0 (
+    echo   ❌ PyInstaller 빌드 실패
+    goto :error
+)
+echo.
+
+REM [4/4] 빌드 결과 확인
+echo [4/4] 빌드 결과 확인
+if exist "dist\AiBuilder.exe" (
+    echo   ✅ 빌드 성공: dist\AiBuilder.exe
+) else (
+    echo   ❌ 빌드 결과물을 찾을 수 없습니다.
+    goto :error
+)
+
+echo.
+echo ============================================================
+echo  빌드 완료
+echo ============================================================
+goto :end
+
+:error
+echo.
+echo ============================================================
+echo  빌드 실패
+echo ============================================================
+exit /b 1
+
+:end
+exit /b 0

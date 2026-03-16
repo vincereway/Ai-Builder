@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1000</width>
+    <height>750</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Ai-Builder</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout_main">
+    <item>
+     <layout class="QHBoxLayout">
+      <item>
+       <widget class="QLabel" name="lbl_connection_status_icon">
+        <property name="text">
+         <string>⚪</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="lbl_connection_status_text">
+        <property name="text">
+         <string>미설정</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer>
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btn_open_settings">
+        <property name="text">
+               <string>⚙ API 키 설정</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="group_encounters">
+      <property name="title">
+             <string>문서</string>
+      </property>
+      <layout class="QHBoxLayout">
+       <item>
+                <widget class="QWidget" name="widget_document_left">
+                 <property name="minimumSize">
+                    <size>
+                     <width>300</width>
+                     <height>0</height>
+                    </size>
+                 </property>
+                 <property name="maximumSize">
+                    <size>
+                     <width>300</width>
+                     <height>16777215</height>
+                    </size>
+                 </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_document_left">
+                    <item>
+                            <layout class="QGridLayout" name="gridLayout_encounter_date_controls">
+                                <item row="0" column="1" rowspan="2">
+                         <widget class="QPushButton" name="btn_prev_date">
+                            <property name="sizePolicy">
+                                      <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                             </sizepolicy>
+                            </property>
+                                     <property name="minimumSize">
+                                      <size>
+                                        <width>32</width>
+                                        <height>0</height>
+                                      </size>
+                                     </property>
+                                     <property name="maximumSize">
+                                      <size>
+                                        <width>32</width>
+                                        <height>16777215</height>
+                                      </size>
+                                     </property>
+                            <property name="text">
+                             <string>◀</string>
+                            </property>
+                         </widget>
+                        </item>
+                                <item row="0" column="2">
+                         <widget class="QDateEdit" name="date_edit_encounter">
+                            <property name="displayFormat">
+                             <string>yyyy-MM-dd</string>
+                            </property>
+                            <property name="calendarPopup">
+                             <bool>true</bool>
+                            </property>
+                         </widget>
+                        </item>
+                                <item row="0" column="3" rowspan="2">
+                         <widget class="QPushButton" name="btn_next_date">
+                            <property name="sizePolicy">
+                                      <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                             </sizepolicy>
+                            </property>
+                                     <property name="minimumSize">
+                                      <size>
+                                        <width>32</width>
+                                        <height>0</height>
+                                      </size>
+                                     </property>
+                                     <property name="maximumSize">
+                                      <size>
+                                        <width>32</width>
+                                        <height>16777215</height>
+                                      </size>
+                                     </property>
+                            <property name="text">
+                             <string>▶</string>
+                            </property>
+                         </widget>
+                        </item>
+                                <item row="0" column="4" rowspan="2">
+                         <widget class="QPushButton" name="btn_load_encounters">
+                            <property name="sizePolicy">
+                             <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                             </sizepolicy>
+                            </property>
+                            <property name="text">
+                             <string>조회</string>
+                            </property>
+                         </widget>
+                        </item>
+                                <item row="1" column="2">
+                         <widget class="QPushButton" name="btn_go_today">
+                            <property name="text">
+                             <string>오늘로 이동</string>
+                            </property>
+                         </widget>
+                        </item>
+                     </layout>
+                    </item>
+                      <item>
+                      <widget class="QTableWidget" name="list_encounters">
+                       <property name="columnCount">
+                        <number>2</number>
+                       </property>
+                       <property name="rowCount">
+                        <number>0</number>
+                       </property>
+                       <attribute name="horizontalHeaderVisible">
+                        <bool>true</bool>
+                       </attribute>
+                       <column>
+                        <property name="text">
+                        <string>No.</string>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                        <string>Name</string>
+                        </property>
+                       </column>
+                      </widget>
+                      </item>
+                 </layout>
+                </widget>
+       </item>
+       <item>
+        <layout class="QVBoxLayout">
+         <item>
+          <widget class="QPlainTextEdit" name="txt_plain_note">
+           <property name="placeholderText">
+                              <string>보강할 문서를 넣어주세요.</string>
+           </property>
+          </widget>
+         </item>
+                        <item>
+                          <layout class="QHBoxLayout" name="horizontalLayout_enhance_actions">
+                           <item>
+                            <widget class="QPushButton" name="btn_enhance">
+                             <property name="text">
+                               <string>Enhance</string>
+                             </property>
+                            </widget>
+                           </item>
+                           <item>
+                            <widget class="QPushButton" name="btn_result_view_settings">
+                             <property name="text">
+                              <string>결과보기 설정</string>
+                             </property>
+                            </widget>
+                           </item>
+                          </layout>
+                        </item>
+         <item>
+          <widget class="QPlainTextEdit" name="txt_enhanced_result">
+                   <property name="readOnly">
+                    <bool>true</bool>
+                   </property>
+           <property name="placeholderText">
+            <string>AI Enhance 결과가 여기에 표시됩니다</string>
+           </property>
+          </widget>
+         </item>
+                         <item>
+                              <widget class="QPushButton" name="btn_save_to_sigma">
+                               <property name="text">
+                             <string>클립보드에 복사</string>
+                               </property>
+                              </widget>
+                         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="group_system_prompts">
+      <property name="title">
+             <string>AI Agent</string>
+      </property>
+      <layout class="QHBoxLayout">
+       <item>
+        <layout class="QVBoxLayout">
+                 <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_ai_agent_selector">
+                    <item>
+                     <widget class="QLabel" name="label_ai_agent">
+                      <property name="text">
+                       <string>Agent 선택:</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QComboBox" name="combo_ai_agent"/>
+                    </item>
+                   </layout>
+                  </item>
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_system_prompt_header">
+                    <item>
+                     <widget class="QLabel" name="label_system_prompt_list">
+                      <property name="text">
+                       <string>System Prompt</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <spacer>
+                      <property name="orientation">
+                       <enum>Qt::Orientation::Horizontal</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>40</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                   </layout>
+                  </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_system_prompt_list_area">
+          <item>
+          <widget class="QListWidget" name="list_system_prompts"/>
+          </item>
+          <item>
+          <layout class="QVBoxLayout" name="verticalLayout_system_prompt_move_buttons">
+           <item>
+            <spacer>
+             <property name="orientation">
+              <enum>Qt::Orientation::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+              <item>
+                <widget class="QPushButton" name="btn_sp_new">
+                 <property name="text">
+                  <string>새로 만들기</string>
+                 </property>
+                </widget>
+              </item>
+              <item>
+                <widget class="QPushButton" name="btn_sp_delete">
+                 <property name="text">
+                  <string>삭제</string>
+                 </property>
+                </widget>
+              </item>
+              <item>
+                <widget class="QFrame" name="line_sp_action_separator">
+                 <property name="frameShape">
+                  <enum>QFrame::Shape::HLine</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Shadow::Sunken</enum>
+                 </property>
+                </widget>
+              </item>
+           <item>
+            <widget class="QPushButton" name="btn_sp_move_up">
+             <property name="text">
+                                        <string>▲ 위로</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btn_sp_move_down">
+             <property name="text">
+                                        <string>▼ 아래로</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer>
+             <property name="orientation">
+              <enum>Qt::Orientation::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+          </item>
+         </layout>
+        </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QVBoxLayout">
+         <item>
+          <layout class="QHBoxLayout">
+           <item>
+            <widget class="QLabel" name="label">
+             <property name="text">
+              <string>제목:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="edit_sp_title"/>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>내용:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+                         <layout class="QHBoxLayout" name="horizontalLayout_sp_content_area">
+                          <item>
+                              <widget class="QPlainTextEdit" name="txt_sp_content"/>
+                          </item>
+                          <item>
+                              <layout class="QVBoxLayout" name="verticalLayout_sp_action_buttons">
+                               <item>
+                                   <widget class="QPushButton" name="btn_sp_edit">
+                                    <property name="minimumSize">
+                                        <size>
+                                         <width>96</width>
+                                         <height>0</height>
+                                        </size>
+                                    </property>
+                                    <property name="text">
+                                        <string>수정</string>
+                                    </property>
+                                   </widget>
+                               </item>
+                               <item>
+                                   <widget class="QPushButton" name="btn_sp_cancel">
+                                    <property name="minimumSize">
+                                        <size>
+                                         <width>96</width>
+                                         <height>0</height>
+                                        </size>
+                                    </property>
+                                    <property name="text">
+                                        <string>취소</string>
+                                    </property>
+                                   </widget>
+                               </item>
+                               <item>
+                                   <widget class="QPushButton" name="btn_sp_save">
+                                    <property name="minimumSize">
+                                        <size>
+                                         <width>96</width>
+                                         <height>0</height>
+                                        </size>
+                                    </property>
+                                    <property name="text">
+                                        <string>저장</string>
+                                    </property>
+                                   </widget>
+                               </item>
+                               <item>
+                                   <spacer>
+                                    <property name="orientation">
+                                        <enum>Qt::Orientation::Vertical</enum>
+                                    </property>
+                                    <property name="sizeHint" stdset="0">
+                                        <size>
+                                         <width>20</width>
+                                         <height>40</height>
+                                        </size>
+                                    </property>
+                                   </spacer>
+                               </item>
+                              </layout>
+                          </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -1,3 +1,10 @@
+*.sqlite3
+# Certificates
+certs/
+
+# Config (contains API keys)
+conf/conf.yml
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

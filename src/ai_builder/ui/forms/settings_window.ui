@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SettingsWindow</class>
+ <widget class="QDialog" name="SettingsWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>620</width>
+        <height>630</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>설정</string>
+  </property>
+  <property name="modal">
+   <bool>true</bool>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout">
+     <item>
+      <spacer>
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="lbl_settings_connection_status_icon">
+       <property name="text">
+        <string>⚪</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="lbl_settings_connection_status_text">
+       <property name="text">
+        <string>미설정</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="group_sigma">
+     <property name="title">
+      <string>시그마차트 API</string>
+     </property>
+     <layout class="QGridLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>서버 IP:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="edit_sigma_server_ip">
+        <property name="placeholderText">
+         <string>192.168.0.100</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QPushButton" name="btn_sigma_search">
+        <property name="text">
+         <string>검색하기</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>API 키:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="edit_sigma_api_key">
+        <property name="placeholderText">
+         <string>sigma_xxxxxxxxxxxxxxxxxxxx</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QPushButton" name="btn_sigma_api_key_save">
+        <property name="text">
+         <string>저장</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="QLabel" name="lbl_sigma_api_status">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="group_gemini">
+     <property name="title">
+      <string>Gemini (Google AI)</string>
+     </property>
+     <layout class="QGridLayout">
+      <item row="0" column="1" colspan="2">
+       <widget class="QPushButton" name="btn_open_gemini_link">
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="text">
+         <string>Google AI Studio로 이동하기</string>
+        </property>
+        <property name="flat">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QPushButton" name="btn_gemini_model_refresh">
+        <property name="text">
+         <string>모델목록 갱신하기</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1" colspan="2">
+       <widget class="QLabel" name="lbl_gemini_model_status">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="edit_gemini_api_key">
+        <property name="placeholderText">
+         <string>AIzaSy_xxxxxxxxxxxxxxxxx</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QComboBox" name="combo_gemini_model"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="lbl_gemini_model">
+        <property name="text">
+         <string>모델:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QPushButton" name="btn_gemini_api_key_save">
+        <property name="text">
+         <string>저장</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>API 키:</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="group_openai">
+     <property name="title">
+      <string>OpenAI GPT</string>
+     </property>
+     <layout class="QGridLayout">
+      <item row="0" column="1" colspan="2">
+       <widget class="QPushButton" name="btn_open_openai_link">
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="text">
+         <string>OpenAI 플랫폼 이동하기</string>
+        </property>
+        <property name="flat">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>SECRET KEY:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1" colspan="2">
+       <widget class="QLabel" name="lbl_openai_model_status">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QPushButton" name="btn_openai_model_refresh">
+        <property name="text">
+         <string>모델목록 갱신하기</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="lbl_openai_model">
+        <property name="text">
+         <string>모델:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="edit_openai_api_key">
+        <property name="placeholderText">
+         <string>sk-xxxxxxxxxxxxxxxxxxxx</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QPushButton" name="btn_openai_api_key_save">
+        <property name="text">
+         <string>저장</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QComboBox" name="combo_openai_model"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+    <item>
+     <widget class="QGroupBox" name="group_claude">
+        <property name="title">
+         <string>Claude (Anthropic)</string>
+        </property>
+        <layout class="QGridLayout">
+         <item row="0" column="1" colspan="2">
+            <widget class="QPushButton" name="btn_open_claude_link">
+             <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
+             </property>
+             <property name="text">
+                <string>Anthropic Console로 이동하기</string>
+             </property>
+             <property name="flat">
+                <bool>true</bool>
+             </property>
+            </widget>
+         </item>
+         <item row="1" column="0">
+            <widget class="QLabel" name="label_claude_api_key">
+             <property name="text">
+                <string>API 키:</string>
+             </property>
+            </widget>
+         </item>
+         <item row="1" column="1">
+            <widget class="QLineEdit" name="edit_claude_api_key">
+             <property name="placeholderText">
+                <string>sk-ant-xxxxxxxxxxxxxxxxxxxx</string>
+             </property>
+            </widget>
+         </item>
+         <item row="1" column="2">
+            <widget class="QPushButton" name="btn_claude_api_key_save">
+             <property name="text">
+                <string>저장</string>
+             </property>
+            </widget>
+         </item>
+         <item row="2" column="0">
+            <widget class="QLabel" name="lbl_claude_model">
+             <property name="text">
+                <string>모델:</string>
+             </property>
+            </widget>
+         </item>
+         <item row="2" column="1">
+            <widget class="QComboBox" name="combo_claude_model"/>
+         </item>
+         <item row="2" column="2">
+            <widget class="QPushButton" name="btn_claude_model_refresh">
+             <property name="text">
+                <string>모델목록 갱신하기</string>
+             </property>
+            </widget>
+         </item>
+         <item row="3" column="1" colspan="2">
+            <widget class="QLabel" name="lbl_claude_model_status">
+             <property name="text">
+                <string/>
+             </property>
+             <property name="wordWrap">
+                <bool>true</bool>
+             </property>
+            </widget>
+         </item>
+        </layout>
+     </widget>
+    </item>
+   <item>
+    <layout class="QHBoxLayout">
+     <item>
+      <spacer>
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_settings_close">
+       <property name="text">
+        <string>닫기</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

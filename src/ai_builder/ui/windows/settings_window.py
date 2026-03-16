@@ -19,8 +19,14 @@ from ai_builder.services.connection_status_service import get_connection_status_
 from ai_builder.services.network_scanner import NetworkScanner
 from ai_builder.workers.scan_worker import ScanWorker
 from ai_builder.constants.enums import (
+    AI_AGENT_CLAUDE,
     DEFAULT_GEMINI_MODEL,
+    DEFAULT_CLAUDE_MODEL,
     DEFAULT_OPENAI_MODEL,
+    CLAUDE_API_KEYS_URL,
+    CLAUDE_API_VERSION,
+    CLAUDE_MESSAGES_URL,
+    CLAUDE_MODELS_URL,
     ENCOUNTERS_URL,
     GEMINI_API_KEYS_URL,
     GEMINI_API_URL,
@@ -49,8 +55,10 @@ class SettingsWindow(QDialog):
         self.sigma_api_key_valid: bool = False
         self.gemini_api_key_valid: bool = False
         self.openai_api_key_valid: bool = False
+        self.claude_api_key_valid: bool = False
         self._is_loading_gemini_models: bool = False
         self._is_loading_openai_models: bool = False
+        self._is_loading_claude_models: bool = False
 
         self._scan_worker: ScanWorker | None = None
         self._connection_status_service = get_connection_status_service()
@@ -66,6 +74,7 @@ class SettingsWindow(QDialog):
         self.ui.edit_sigma_api_key.setText(nn_conf.sigma_api_key or '')
         self.ui.edit_gemini_api_key.setText(nn_conf.gemini_api_key or '')
         self.ui.edit_openai_api_key.setText(nn_conf.openai_api_key or '')
+        self.ui.edit_claude_api_key.setText(nn_conf.claude_api_key or '')
 
         self._set_single_model_option(
             self.ui.combo_gemini_model,
@@ -75,6 +84,10 @@ class SettingsWindow(QDialog):
             self.ui.combo_openai_model,
             nn_conf.openai_model_id or DEFAULT_OPENAI_MODEL,
         )
+        self._set_single_model_option(
+            self.ui.combo_claude_model,
+            nn_conf.claude_model_id or DEFAULT_CLAUDE_MODEL,
+        )
         self._set_status_label(
             self.ui.lbl_gemini_model_status,
             f"현재 모델: {nn_conf.gemini_model_id or DEFAULT_GEMINI_MODEL}",
@@ -83,6 +96,11 @@ class SettingsWindow(QDialog):
         self._set_status_label(
             self.ui.lbl_openai_model_status,
             f"현재 모델: {nn_conf.openai_model_id or DEFAULT_OPENAI_MODEL}",
+            'info',
+        )
+        self._set_status_label(
+            self.ui.lbl_claude_model_status,
+            f"현재 모델: {nn_conf.claude_model_id or DEFAULT_CLAUDE_MODEL}",
             'info',
         )
 
@@ -98,12 +116,16 @@ class SettingsWindow(QDialog):
         self.ui.btn_sigma_api_key_save.clicked.connect(self._on_save_sigma_api_key_clicked)
         self.ui.btn_gemini_api_key_save.clicked.connect(self._on_save_gemini_api_key_clicked)
         self.ui.btn_openai_api_key_save.clicked.connect(self._on_save_openai_api_key_clicked)
+        self.ui.btn_claude_api_key_save.clicked.connect(self._on_save_claude_api_key_clicked)
         self.ui.btn_gemini_model_refresh.clicked.connect(self._refresh_gemini_model_list)
         self.ui.btn_openai_model_refresh.clicked.connect(self._refresh_openai_model_list)
+        self.ui.btn_claude_model_refresh.clicked.connect(self._refresh_claude_model_list)
         self.ui.combo_gemini_model.currentTextChanged.connect(self._on_gemini_model_changed)
         self.ui.combo_openai_model.currentTextChanged.connect(self._on_openai_model_changed)
+        self.ui.combo_claude_model.currentTextChanged.connect(self._on_claude_model_changed)
         self.ui.btn_open_gemini_link.clicked.connect(lambda: webbrowser.open(GEMINI_API_KEYS_URL))
         self.ui.btn_open_openai_link.clicked.connect(lambda: webbrowser.open(OPENAI_API_KEYS_URL))
+        self.ui.btn_open_claude_link.clicked.connect(lambda: webbrowser.open(CLAUDE_API_KEYS_URL))
         self.ui.btn_settings_close.clicked.connect(self.close)
 
     def _load_model_lists_if_available(self):
@@ -117,6 +139,11 @@ class SettingsWindow(QDialog):
             self._load_cached_openai_model_list()
         elif nn_conf.openai_api_key:
             self._refresh_openai_model_list()
+
+        if nn_conf.claude_model_list:
+            self._load_cached_claude_model_list()
+        elif nn_conf.claude_api_key:
+            self._refresh_claude_model_list()
 
     def _update_connection_status(self, is_alive: bool | str | None):
         """연결 상태 아이콘/텍스트 갱신"""
@@ -309,6 +336,38 @@ class SettingsWindow(QDialog):
             self._set_status_label(self.ui.lbl_openai_model_status, str(e)[:40], 'danger')
             app_logger.error(f"OpenAI API 키 검증 실패: {e}")
 
+    def _on_save_claude_api_key_clicked(self):
+        """Claude API 키 저장 및 검증"""
+        api_key = self.ui.edit_claude_api_key.text().strip()
+        if not api_key:
+            show_error(self, "설정 오류", "Claude API 키를 입력해 주세요.")
+            return
+
+        headers = {
+            'x-api-key': api_key,
+            'anthropic-version': CLAUDE_API_VERSION,
+        }
+
+        try:
+            resp = requests.get(CLAUDE_MODELS_URL, headers=headers, timeout=10)
+            if resp.status_code == 200:
+                self.claude_api_key_valid = True
+                nn_conf.save_config('CLAUDE_API_KEY', api_key)
+                self._set_status_label(self.ui.lbl_claude_model_status, "API 키 유효함", 'success')
+                self._refresh_claude_model_list(api_key_validated=True)
+                self._emit_settings_changed()
+                app_logger.info("Claude API 키 검증 성공")
+            elif resp.status_code == 401:
+                self.claude_api_key_valid = False
+                self._set_status_label(self.ui.lbl_claude_model_status, "API 키 값이 올바르지 않습니다", 'danger')
+            else:
+                self.claude_api_key_valid = False
+                self._set_status_label(self.ui.lbl_claude_model_status, f"서버 응답: {resp.status_code}", 'danger')
+        except Exception as e:
+            self.claude_api_key_valid = False
+            self._set_status_label(self.ui.lbl_claude_model_status, str(e)[:40], 'danger')
+            app_logger.error(f"Claude API 키 검증 실패: {e}")
+
     def _refresh_gemini_model_list(self, api_key_validated: bool = False):
         """Gemini 모델 목록 자동 조회 후 드롭다운 갱신"""
         api_key = self.ui.edit_gemini_api_key.text().strip()
@@ -447,6 +506,76 @@ class SettingsWindow(QDialog):
         self._set_status_label(self.ui.lbl_openai_model_status, f"선택 모델 저장됨: {model_id}", 'success')
         self._emit_settings_changed()
 
+    def _refresh_claude_model_list(self, api_key_validated: bool = False):
+        """Claude 모델 목록 자동 조회 후 드롭다운 갱신"""
+        api_key = self.ui.edit_claude_api_key.text().strip()
+        if not api_key:
+            self._set_status_label(self.ui.lbl_claude_model_status, "API 키를 먼저 저장해 주세요", 'warning')
+            self._set_single_model_option(self.ui.combo_claude_model, nn_conf.claude_model_id or DEFAULT_CLAUDE_MODEL)
+            return
+
+        self._is_loading_claude_models = True
+        self.ui.btn_claude_model_refresh.setEnabled(False)
+        self.ui.btn_claude_model_refresh.setText("모델목록 갱신 중...")
+        self._set_status_label(self.ui.lbl_claude_model_status, "모델 목록 조회 중...", 'info')
+
+        headers = {
+            'x-api-key': api_key,
+            'anthropic-version': CLAUDE_API_VERSION,
+        }
+
+        try:
+            resp = requests.get(CLAUDE_MODELS_URL, headers=headers, timeout=10)
+            if resp.status_code != 200:
+                raise RuntimeError(f"HTTP {resp.status_code}")
+
+            response_data = resp.json()
+            model_ids = []
+            for model in response_data.get('data', []) or response_data.get('models', []):
+                model_id = str(model.get('id') or model.get('name') or '').strip()
+                if not model_id:
+                    continue
+                if 'claude' not in model_id.lower():
+                    continue
+                model_ids.append(model_id)
+
+            model_ids = self._sort_claude_model_ids(self._dedupe_preserve_order(model_ids))
+            selected_model_id = self._resolve_preferred_model(
+                model_ids,
+                nn_conf.claude_model_id,
+                DEFAULT_CLAUDE_MODEL,
+            )
+            self._populate_model_combo(self.ui.combo_claude_model, model_ids, selected_model_id)
+            nn_conf.save_config('CLAUDE_MODEL_LIST', model_ids)
+            nn_conf.save_config('CLAUDE_MODEL_ID', selected_model_id)
+            status_text = f"{len(model_ids)}개 모델 조회됨, 최신순 정렬"
+            if api_key_validated:
+                status_text = f"API 키 유효함 · {status_text}"
+            self._set_status_label(self.ui.lbl_claude_model_status, status_text, 'success')
+        except Exception as e:
+            fallback_model_id = nn_conf.claude_model_id or DEFAULT_CLAUDE_MODEL
+            self._set_single_model_option(self.ui.combo_claude_model, fallback_model_id)
+            status_text = f"조회 실패, 현재 모델 유지: {fallback_model_id}"
+            if api_key_validated:
+                status_text = f"API 키 유효함 · {status_text}"
+            self._set_status_label(self.ui.lbl_claude_model_status, status_text, 'warning')
+            app_logger.error(f"Claude 모델 목록 조회 실패: {e}")
+        finally:
+            self._is_loading_claude_models = False
+            self.ui.btn_claude_model_refresh.setEnabled(True)
+            self.ui.btn_claude_model_refresh.setText("모델목록 갱신하기")
+
+    def _on_claude_model_changed(self, text: str):
+        """Claude 모델 선택 즉시 저장"""
+        if self._is_loading_claude_models:
+            return
+        model_id = self.ui.combo_claude_model.currentData() or text.strip()
+        if not model_id:
+            return
+        nn_conf.save_config('CLAUDE_MODEL_ID', model_id)
+        self._set_status_label(self.ui.lbl_claude_model_status, f"선택 모델 저장됨: {model_id}", 'success')
+        self._emit_settings_changed()
+
     def _apply_visual_design(self):
         """설정창 전용 스타일과 아이콘 적용"""
         self.setObjectName('SettingsWindow')
@@ -482,6 +611,19 @@ class SettingsWindow(QDialog):
         self._populate_model_combo(self.ui.combo_openai_model, model_ids, selected_model_id)
         self._set_status_label(self.ui.lbl_openai_model_status, f"저장된 목록 {len(model_ids)}개 불러옴, 최신순 정렬", 'info')
 
+    def _load_cached_claude_model_list(self):
+        """저장된 Claude 모델 목록을 즉시 표시"""
+        model_ids = self._sort_claude_model_ids(self._dedupe_preserve_order(nn_conf.claude_model_list))
+        if not model_ids:
+            return
+        selected_model_id = self._resolve_preferred_model(
+            model_ids,
+            nn_conf.claude_model_id,
+            DEFAULT_CLAUDE_MODEL,
+        )
+        self._populate_model_combo(self.ui.combo_claude_model, model_ids, selected_model_id)
+        self._set_status_label(self.ui.lbl_claude_model_status, f"저장된 목록 {len(model_ids)}개 불러옴, 최신순 정렬", 'info')
+
     def _apply_widget_roles(self):
         """버튼 역할 속성 지정"""
         role_map = {
@@ -493,6 +635,7 @@ class SettingsWindow(QDialog):
             self.ui.btn_openai_model_refresh: 'secondary',
             self.ui.btn_open_gemini_link: 'link',
             self.ui.btn_open_openai_link: 'link',
+            self.ui.btn_open_claude_link: 'link',
             self.ui.btn_settings_close: 'ghost',
         }
 
@@ -507,10 +650,13 @@ class SettingsWindow(QDialog):
             self.ui.btn_sigma_api_key_save: QStyle.StandardPixmap.SP_DialogSaveButton,
             self.ui.btn_gemini_api_key_save: QStyle.StandardPixmap.SP_DialogSaveButton,
             self.ui.btn_openai_api_key_save: QStyle.StandardPixmap.SP_DialogSaveButton,
+            self.ui.btn_claude_api_key_save: QStyle.StandardPixmap.SP_DialogSaveButton,
             self.ui.btn_gemini_model_refresh: QStyle.StandardPixmap.SP_BrowserReload,
             self.ui.btn_openai_model_refresh: QStyle.StandardPixmap.SP_BrowserReload,
+            self.ui.btn_claude_model_refresh: QStyle.StandardPixmap.SP_BrowserReload,
             self.ui.btn_open_gemini_link: QStyle.StandardPixmap.SP_ArrowForward,
             self.ui.btn_open_openai_link: QStyle.StandardPixmap.SP_ArrowForward,
+            self.ui.btn_open_claude_link: QStyle.StandardPixmap.SP_ArrowForward,
             self.ui.btn_settings_close: QStyle.StandardPixmap.SP_DialogCloseButton,
         }
 
@@ -715,8 +861,10 @@ class SettingsWindow(QDialog):
             'sigma_api_key': nn_conf.sigma_api_key,
             'gemini_api_key': nn_conf.gemini_api_key,
             'openai_api_key': nn_conf.openai_api_key,
+            'claude_api_key': nn_conf.claude_api_key,
             'gemini_model_id': nn_conf.gemini_model_id,
             'openai_model_id': nn_conf.openai_model_id,
+            'claude_model_id': nn_conf.claude_model_id,
             'selected_ai_agent': nn_conf.selected_ai_agent,
         }
         self.settings_changed.emit(data)
@@ -829,3 +977,25 @@ class SettingsWindow(QDialog):
             ),
             reverse=True,
         )
+
+    @staticmethod
+    def _sort_claude_model_ids(model_ids: list[str]) -> list[str]:
+        """Claude 모델명을 최신 계열 우선으로 정렬"""
+        def family_rank(model_id: str) -> tuple[int, int, int]:
+            lowered = model_id.lower()
+            if 'opus' in lowered:
+                family = 3
+            elif 'sonnet' in lowered:
+                family = 2
+            elif 'haiku' in lowered:
+                family = 1
+            else:
+                family = 0
+
+            number_match = re.search(r'claude-(\d+)(?:-(\d+))?', lowered)
+            major = int(number_match.group(1)) if number_match else 0
+            minor = int(number_match.group(2)) if number_match and number_match.group(2) else 0
+            latest_bias = 1 if 'latest' in lowered else 0
+            return (major, minor, family + latest_bias)
+
+        return sorted(model_ids, key=lambda model_id: (family_rank(model_id), model_id), reverse=True)

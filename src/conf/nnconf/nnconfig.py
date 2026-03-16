@@ -55,10 +55,13 @@ class Config:
         self.sigma_api_key: str = ''
         self.gemini_api_key: str = ''
         self.openai_api_key: str = ''
+        self.claude_api_key: str = ''
         self.gemini_model_id: str = 'gemini-3.1-flash-lite-preview'
         self.openai_model_id: str = 'gpt-5.4'
+        self.claude_model_id: str = 'claude-sonnet-4-6'
         self.gemini_model_list: list[str] = []
         self.openai_model_list: list[str] = []
+        self.claude_model_list: list[str] = []
         self.selected_ai_agent: str = 'gemini'
         self.result_view_settings: dict = {
             'chief_complaint': 'C/C',
@@ -85,10 +88,13 @@ class Config:
         'SIGMA_API_KEY': ('sigma_api_key', str, ''),
         'GEMINI_API_KEY': ('gemini_api_key', str, ''),
         'OPENAI_API_KEY': ('openai_api_key', str, ''),
+        'CLAUDE_API_KEY': ('claude_api_key', str, ''),
         'GEMINI_MODEL_ID': ('gemini_model_id', str, 'gemini-3.1-flash-lite-preview'),
         'OPENAI_MODEL_ID': ('openai_model_id', str, 'gpt-5.4'),
+        'CLAUDE_MODEL_ID': ('claude_model_id', str, 'claude-sonnet-4-6'),
         'GEMINI_MODEL_LIST': ('gemini_model_list', list, []),
         'OPENAI_MODEL_LIST': ('openai_model_list', list, []),
+        'CLAUDE_MODEL_LIST': ('claude_model_list', list, []),
         'SELECTED_AI_AGENT': ('selected_ai_agent', str, 'gemini'),
         'RESULT_VIEW_SETTINGS': ('result_view_settings', dict, {
             'chief_complaint': 'C/C',

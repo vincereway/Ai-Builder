@@ -24,7 +24,7 @@ class Ui_SettingsWindow(object):
     def setupUi(self, SettingsWindow):
         if not SettingsWindow.objectName():
             SettingsWindow.setObjectName(u"SettingsWindow")
-        SettingsWindow.resize(620, 461)
+        SettingsWindow.resize(620, 630)
         SettingsWindow.setModal(True)
         self.verticalLayout = QVBoxLayout(SettingsWindow)
         self.verticalLayout.setObjectName(u"verticalLayout")
@@ -189,6 +189,56 @@ class Ui_SettingsWindow(object):
 
         self.verticalLayout.addWidget(self.group_openai)
 
+        self.group_claude = QGroupBox(SettingsWindow)
+        self.group_claude.setObjectName(u"group_claude")
+        self.gridLayout3 = QGridLayout(self.group_claude)
+        self.gridLayout3.setObjectName(u"gridLayout3")
+        self.btn_open_claude_link = QPushButton(self.group_claude)
+        self.btn_open_claude_link.setObjectName(u"btn_open_claude_link")
+        self.btn_open_claude_link.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.btn_open_claude_link.setFlat(True)
+
+        self.gridLayout3.addWidget(self.btn_open_claude_link, 0, 1, 1, 2)
+
+        self.label_claude_api_key = QLabel(self.group_claude)
+        self.label_claude_api_key.setObjectName(u"label_claude_api_key")
+
+        self.gridLayout3.addWidget(self.label_claude_api_key, 1, 0, 1, 1)
+
+        self.edit_claude_api_key = QLineEdit(self.group_claude)
+        self.edit_claude_api_key.setObjectName(u"edit_claude_api_key")
+
+        self.gridLayout3.addWidget(self.edit_claude_api_key, 1, 1, 1, 1)
+
+        self.btn_claude_api_key_save = QPushButton(self.group_claude)
+        self.btn_claude_api_key_save.setObjectName(u"btn_claude_api_key_save")
+
+        self.gridLayout3.addWidget(self.btn_claude_api_key_save, 1, 2, 1, 1)
+
+        self.lbl_claude_model = QLabel(self.group_claude)
+        self.lbl_claude_model.setObjectName(u"lbl_claude_model")
+
+        self.gridLayout3.addWidget(self.lbl_claude_model, 2, 0, 1, 1)
+
+        self.combo_claude_model = QComboBox(self.group_claude)
+        self.combo_claude_model.setObjectName(u"combo_claude_model")
+
+        self.gridLayout3.addWidget(self.combo_claude_model, 2, 1, 1, 1)
+
+        self.btn_claude_model_refresh = QPushButton(self.group_claude)
+        self.btn_claude_model_refresh.setObjectName(u"btn_claude_model_refresh")
+
+        self.gridLayout3.addWidget(self.btn_claude_model_refresh, 2, 2, 1, 1)
+
+        self.lbl_claude_model_status = QLabel(self.group_claude)
+        self.lbl_claude_model_status.setObjectName(u"lbl_claude_model_status")
+        self.lbl_claude_model_status.setWordWrap(True)
+
+        self.gridLayout3.addWidget(self.lbl_claude_model_status, 3, 1, 1, 2)
+
+
+        self.verticalLayout.addWidget(self.group_claude)
+
         self.hboxLayout1 = QHBoxLayout()
         self.hboxLayout1.setObjectName(u"hboxLayout1")
         self.spacerItem1 = QSpacerItem(0, 0, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
@@ -237,6 +287,14 @@ class Ui_SettingsWindow(object):
         self.lbl_openai_model.setText(QCoreApplication.translate("SettingsWindow", u"\ubaa8\ub378:", None))
         self.edit_openai_api_key.setPlaceholderText(QCoreApplication.translate("SettingsWindow", u"sk-xxxxxxxxxxxxxxxxxxxx", None))
         self.btn_openai_api_key_save.setText(QCoreApplication.translate("SettingsWindow", u"\uc800\uc7a5", None))
+        self.group_claude.setTitle(QCoreApplication.translate("SettingsWindow", u"Claude (Anthropic)", None))
+        self.btn_open_claude_link.setText(QCoreApplication.translate("SettingsWindow", u"Anthropic Console\ub85c \uc774\ub3d9\ud558\uae30", None))
+        self.label_claude_api_key.setText(QCoreApplication.translate("SettingsWindow", u"API \ud0a4:", None))
+        self.edit_claude_api_key.setPlaceholderText(QCoreApplication.translate("SettingsWindow", u"sk-ant-xxxxxxxxxxxxxxxxxxxx", None))
+        self.btn_claude_api_key_save.setText(QCoreApplication.translate("SettingsWindow", u"\uc800\uc7a5", None))
+        self.lbl_claude_model.setText(QCoreApplication.translate("SettingsWindow", u"\ubaa8\ub378:", None))
+        self.btn_claude_model_refresh.setText(QCoreApplication.translate("SettingsWindow", u"\ubaa8\ub378\ubaa9\ub85d \uac31\uc2e0\ud558\uae30", None))
+        self.lbl_claude_model_status.setText("")
         self.btn_settings_close.setText(QCoreApplication.translate("SettingsWindow", u"\ub2eb\uae30", None))
     # retranslateUi
 

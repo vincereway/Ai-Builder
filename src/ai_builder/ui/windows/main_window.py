@@ -33,7 +33,7 @@ from ai_builder.services.sigma_api import SigmaApiClient
 from ai_builder.services.system_prompt_manager import SystemPromptManager
 from ai_builder.workers.encounter_worker import EncounterWorker
 from ai_builder.workers.enhance_worker import EnhanceWorker
-from ai_builder.constants.enums import AI_AGENT_GEMINI, AI_AGENT_OPENAI
+from ai_builder.constants.enums import AI_AGENT_CLAUDE, AI_AGENT_GEMINI, AI_AGENT_OPENAI
 from ai_builder.common.msgbox import show_info, show_warning, show_error, show_confirm
 from ai_builder.version import __app_name__, __version__
 from conf.nnconf.nnconfig import nn_conf
@@ -331,6 +331,8 @@ class MainWindow(QMainWindow):
             self.ui.combo_ai_agent.addItem("Gemini", AI_AGENT_GEMINI)
         if nn_conf.openai_api_key:
             self.ui.combo_ai_agent.addItem("GPT", AI_AGENT_OPENAI)
+        if nn_conf.claude_api_key:
+            self.ui.combo_ai_agent.addItem("Claude", AI_AGENT_CLAUDE)
 
         # 저장된 선택값 복원
         for i in range(self.ui.combo_ai_agent.count()):
@@ -979,6 +981,8 @@ class MainWindow(QMainWindow):
             return nn_conf.gemini_api_key or None
         elif self.current_ai_agent == AI_AGENT_OPENAI:
             return nn_conf.openai_api_key or None
+        elif self.current_ai_agent == AI_AGENT_CLAUDE:
+            return nn_conf.claude_api_key or None
         return None
 
     def _get_current_ai_model_name(self) -> str:
@@ -987,6 +991,8 @@ class MainWindow(QMainWindow):
             return nn_conf.gemini_model_id or '미설정'
         if self.current_ai_agent == AI_AGENT_OPENAI:
             return nn_conf.openai_model_id or '미설정'
+        if self.current_ai_agent == AI_AGENT_CLAUDE:
+            return nn_conf.claude_model_id or '미설정'
         return '미설정'
 
     def _get_result_view_settings(self) -> dict:

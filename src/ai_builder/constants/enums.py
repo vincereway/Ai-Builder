@@ -17,20 +17,26 @@ EXTERNAL_NOTE_URL = "/external/v1/encounters/{encounter_uuid}/external-note"
 # AI 기본 모델명
 DEFAULT_GEMINI_MODEL = "gemini-3.1-flash-lite-preview"
 DEFAULT_OPENAI_MODEL = "gpt-5.4"
+DEFAULT_CLAUDE_MODEL = "claude-sonnet-4-6"
 
 # AI API 엔드포인트
 GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
 GEMINI_MODELS_URL = "https://generativelanguage.googleapis.com/v1beta/models"
 OPENAI_RESPONSES_URL = "https://api.openai.com/v1/responses"
 OPENAI_MODELS_URL = "https://api.openai.com/v1/models"
+CLAUDE_MESSAGES_URL = "https://api.anthropic.com/v1/messages"
+CLAUDE_MODELS_URL = "https://api.anthropic.com/v1/models"
+CLAUDE_API_VERSION = "2023-06-01"
 
 # AI Agent 타입
 AI_AGENT_GEMINI = "gemini"
 AI_AGENT_OPENAI = "openai"
+AI_AGENT_CLAUDE = "claude"
 
 # 외부 링크
 GEMINI_API_KEYS_URL = "https://aistudio.google.com/api-keys?hl=ko"
 OPENAI_API_KEYS_URL = "https://platform.openai.com/settings/organization/api-keys"
+CLAUDE_API_KEYS_URL = "https://console.anthropic.com/settings/keys"
 
 # HTTP 상태 코드별 기본 에러 메시지
 HTTP_ERROR_MESSAGES = {

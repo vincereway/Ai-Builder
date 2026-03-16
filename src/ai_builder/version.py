@@ -4,7 +4,7 @@ Ai-Builder 버전 정보
 앱 이름, 버전, 설명, 제작사 정보를 중앙 관리합니다.
 """
 
-__version__ = "0.0.7"
+__version__ = "0.1.2"
 __app_name__ = "Ai-Builder"
 __description__ = "AI Enhance 도구"
 __author__ = "Ai-Builder"

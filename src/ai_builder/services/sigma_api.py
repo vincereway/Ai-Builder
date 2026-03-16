@@ -124,6 +124,15 @@ class SigmaApiClient:
                         return {'error': '진료 목록 응답에 results 또는 pagination이 없습니다.'}
                     return data
 
+                if resp.status_code == 429:
+                    retry_after = int(resp.headers.get('Retry-After', retry_after))
+                    return {
+                        'error': (
+                            '서버 요청 제한(429 Rate Limit)으로 진료 목록을 불러오지 못했습니다. '
+                            f'{retry_after}초 후 다시 시도해 주세요.'
+                        )
+                    }
+
             return {'error': self._handle_error(resp)}
         except requests.ConnectionError:
             return {'error': '서버에 연결할 수 없습니다.'}

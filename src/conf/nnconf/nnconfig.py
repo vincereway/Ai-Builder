@@ -55,11 +55,19 @@ class Config:
         self.sigma_api_key: str = ''
         self.gemini_api_key: str = ''
         self.openai_api_key: str = ''
-        self.gemini_model_id: str = 'gemini-2.5-flash'
+        self.gemini_model_id: str = 'gemini-3.1-flash-lite-preview'
         self.openai_model_id: str = 'gpt-5.4'
         self.gemini_model_list: list[str] = []
         self.openai_model_list: list[str] = []
         self.selected_ai_agent: str = 'gemini'
+        self.result_view_settings: dict = {
+            'chief_complaint': 'C/C',
+            'onset': 'O/S',
+            'subjective': 'S',
+            'objective': 'O',
+            'assessment': 'A',
+            'plan': 'P',
+        }
         self.log_level: str = 'DEBUG'
         self.request_timeout_seconds: int = 10
         self.scan_timeout_ms: int = 300
@@ -77,11 +85,19 @@ class Config:
         'SIGMA_API_KEY': ('sigma_api_key', str, ''),
         'GEMINI_API_KEY': ('gemini_api_key', str, ''),
         'OPENAI_API_KEY': ('openai_api_key', str, ''),
-        'GEMINI_MODEL_ID': ('gemini_model_id', str, 'gemini-2.5-flash'),
+        'GEMINI_MODEL_ID': ('gemini_model_id', str, 'gemini-3.1-flash-lite-preview'),
         'OPENAI_MODEL_ID': ('openai_model_id', str, 'gpt-5.4'),
         'GEMINI_MODEL_LIST': ('gemini_model_list', list, []),
         'OPENAI_MODEL_LIST': ('openai_model_list', list, []),
         'SELECTED_AI_AGENT': ('selected_ai_agent', str, 'gemini'),
+        'RESULT_VIEW_SETTINGS': ('result_view_settings', dict, {
+            'chief_complaint': 'C/C',
+            'onset': 'O/S',
+            'subjective': 'S',
+            'objective': 'O',
+            'assessment': 'A',
+            'plan': 'P',
+        }),
     }
 
     DEV_YAML_CONFIG_SPECS = {
@@ -219,6 +235,8 @@ class Config:
                 normalized_value = int(value)
             elif expected_type is list:
                 normalized_value = [str(item) for item in (value or []) if item]
+            elif expected_type is dict:
+                normalized_value = dict(value or {})
             elif expected_type is str:
                 normalized_value = str(value or '')
             else:

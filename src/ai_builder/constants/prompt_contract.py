@@ -2,6 +2,8 @@
 
 ENHANCE_JSON_SCHEMA_SUFFIX = """JSON Schema:
 {
+    \"chief_complaint\": \"string\",
+    \"onset\": \"string\",
   \"subjective\": \"string\",
   \"objective\": \"string\",
   \"assessment\": \"string\",

@@ -15,7 +15,7 @@ ENCOUNTER_DETAIL_URL = "/external/v1/encounters/{encounter_uuid}"
 EXTERNAL_NOTE_URL = "/external/v1/encounters/{encounter_uuid}/external-note"
 
 # AI 기본 모델명
-DEFAULT_GEMINI_MODEL = "gemini-2.5-flash"
+DEFAULT_GEMINI_MODEL = "gemini-3.1-flash-lite-preview"
 DEFAULT_OPENAI_MODEL = "gpt-5.4"
 
 # AI API 엔드포인트

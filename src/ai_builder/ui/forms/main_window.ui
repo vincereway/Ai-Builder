@@ -56,82 +56,133 @@
     <item>
      <widget class="QGroupBox" name="group_encounters">
       <property name="title">
-       <string>진료 목록</string>
+             <string>문서</string>
       </property>
       <layout class="QHBoxLayout">
        <item>
-        <layout class="QVBoxLayout">
-         <item>
-          <layout class="QGridLayout" name="gridLayout_encounter_date_controls">
-           <item row="0" column="1" rowspan="2">
-            <widget class="QLabel" name="lbl_encounter_date">
-             <property name="text">
-              <string>날짜:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="2" rowspan="2">
-            <widget class="QPushButton" name="btn_prev_date">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>◀</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="3">
-            <widget class="QDateEdit" name="date_edit_encounter">
-             <property name="displayFormat">
-              <string>yyyy-MM-dd</string>
-             </property>
-             <property name="calendarPopup">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="4" rowspan="2">
-            <widget class="QPushButton" name="btn_next_date">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>▶</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="5" rowspan="2">
-            <widget class="QPushButton" name="btn_load_encounters">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>조회</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="3">
-            <widget class="QPushButton" name="btn_go_today">
-             <property name="text">
-              <string>오늘로 이동</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <widget class="QListWidget" name="list_encounters"/>
-         </item>
-        </layout>
+                <widget class="QWidget" name="widget_document_left">
+                 <property name="minimumSize">
+                    <size>
+                     <width>300</width>
+                     <height>0</height>
+                    </size>
+                 </property>
+                 <property name="maximumSize">
+                    <size>
+                     <width>300</width>
+                     <height>16777215</height>
+                    </size>
+                 </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_document_left">
+                    <item>
+                            <layout class="QGridLayout" name="gridLayout_encounter_date_controls">
+                                <item row="0" column="1" rowspan="2">
+                         <widget class="QPushButton" name="btn_prev_date">
+                            <property name="sizePolicy">
+                                      <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                             </sizepolicy>
+                            </property>
+                                     <property name="minimumSize">
+                                      <size>
+                                        <width>32</width>
+                                        <height>0</height>
+                                      </size>
+                                     </property>
+                                     <property name="maximumSize">
+                                      <size>
+                                        <width>32</width>
+                                        <height>16777215</height>
+                                      </size>
+                                     </property>
+                            <property name="text">
+                             <string>◀</string>
+                            </property>
+                         </widget>
+                        </item>
+                                <item row="0" column="2">
+                         <widget class="QDateEdit" name="date_edit_encounter">
+                            <property name="displayFormat">
+                             <string>yyyy-MM-dd</string>
+                            </property>
+                            <property name="calendarPopup">
+                             <bool>true</bool>
+                            </property>
+                         </widget>
+                        </item>
+                                <item row="0" column="3" rowspan="2">
+                         <widget class="QPushButton" name="btn_next_date">
+                            <property name="sizePolicy">
+                                      <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                             </sizepolicy>
+                            </property>
+                                     <property name="minimumSize">
+                                      <size>
+                                        <width>32</width>
+                                        <height>0</height>
+                                      </size>
+                                     </property>
+                                     <property name="maximumSize">
+                                      <size>
+                                        <width>32</width>
+                                        <height>16777215</height>
+                                      </size>
+                                     </property>
+                            <property name="text">
+                             <string>▶</string>
+                            </property>
+                         </widget>
+                        </item>
+                                <item row="0" column="4" rowspan="2">
+                         <widget class="QPushButton" name="btn_load_encounters">
+                            <property name="sizePolicy">
+                             <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                             </sizepolicy>
+                            </property>
+                            <property name="text">
+                             <string>조회</string>
+                            </property>
+                         </widget>
+                        </item>
+                                <item row="1" column="2">
+                         <widget class="QPushButton" name="btn_go_today">
+                            <property name="text">
+                             <string>오늘로 이동</string>
+                            </property>
+                         </widget>
+                        </item>
+                     </layout>
+                    </item>
+                      <item>
+                      <widget class="QTableWidget" name="list_encounters">
+                       <property name="columnCount">
+                        <number>2</number>
+                       </property>
+                       <property name="rowCount">
+                        <number>0</number>
+                       </property>
+                       <attribute name="horizontalHeaderVisible">
+                        <bool>true</bool>
+                       </attribute>
+                       <column>
+                        <property name="text">
+                        <string>No.</string>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                        <string>Name</string>
+                        </property>
+                       </column>
+                      </widget>
+                      </item>
+                 </layout>
+                </widget>
        </item>
        <item>
         <layout class="QVBoxLayout">
@@ -142,15 +193,29 @@
            </property>
           </widget>
          </item>
-                         <item>
-                              <widget class="QPushButton" name="btn_enhance">
-                               <property name="text">
-                                    <string>Enhance</string>
-                               </property>
-                              </widget>
-                         </item>
+                        <item>
+                          <layout class="QHBoxLayout" name="horizontalLayout_enhance_actions">
+                           <item>
+                            <widget class="QPushButton" name="btn_enhance">
+                             <property name="text">
+                               <string>Enhance</string>
+                             </property>
+                            </widget>
+                           </item>
+                           <item>
+                            <widget class="QPushButton" name="btn_result_view_settings">
+                             <property name="text">
+                              <string>결과보기 설정</string>
+                             </property>
+                            </widget>
+                           </item>
+                          </layout>
+                        </item>
          <item>
           <widget class="QPlainTextEdit" name="txt_enhanced_result">
+                   <property name="readOnly">
+                    <bool>true</bool>
+                   </property>
            <property name="placeholderText">
             <string>AI Enhance 결과가 여기에 표시됩니다</string>
            </property>
@@ -159,17 +224,10 @@
                          <item>
                               <widget class="QPushButton" name="btn_save_to_sigma">
                                <property name="text">
-                                    <string>차트에 저장</string>
+                             <string>클립보드에 복사</string>
                                </property>
                               </widget>
                          </item>
-         <item>
-          <widget class="QLabel" name="lbl_enhanced_result_status">
-           <property name="text">
-            <string>저장할 Enhance 결과가 없습니다.</string>
-           </property>
-          </widget>
-         </item>
         </layout>
        </item>
       </layout>
@@ -188,7 +246,7 @@
                     <item>
                      <widget class="QLabel" name="label_ai_agent">
                       <property name="text">
-                       <string>모델 선택:</string>
+                       <string>Agent 선택:</string>
                       </property>
                      </widget>
                     </item>
@@ -219,20 +277,6 @@
                       </property>
                      </spacer>
                     </item>
-                    <item>
-                     <widget class="QPushButton" name="btn_sp_new">
-                      <property name="text">
-                                             <string>새로 만들기</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QPushButton" name="btn_sp_delete">
-                      <property name="text">
-                       <string>삭제</string>
-                      </property>
-                     </widget>
-                    </item>
                    </layout>
                   </item>
         <item>
@@ -255,6 +299,30 @@
              </property>
             </spacer>
            </item>
+              <item>
+                <widget class="QPushButton" name="btn_sp_new">
+                 <property name="text">
+                  <string>새로 만들기</string>
+                 </property>
+                </widget>
+              </item>
+              <item>
+                <widget class="QPushButton" name="btn_sp_delete">
+                 <property name="text">
+                  <string>삭제</string>
+                 </property>
+                </widget>
+              </item>
+              <item>
+                <widget class="QFrame" name="line_sp_action_separator">
+                 <property name="frameShape">
+                  <enum>QFrame::Shape::HLine</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Shadow::Sunken</enum>
+                 </property>
+                </widget>
+              </item>
            <item>
             <widget class="QPushButton" name="btn_sp_move_up">
              <property name="text">

@@ -14,6 +14,7 @@ class EnhanceWorker(QThread):
 
     result = Signal(str)   # 성공 시 결과 텍스트
     error = Signal(str)    # 오류 시 에러 메시지
+    progress = Signal(str)  # 진행 상태 텍스트
 
     def __init__(self, agent_type: str, system_prompt_text: str,
                  plain_note: str, parent=None):
@@ -24,9 +25,12 @@ class EnhanceWorker(QThread):
 
     def run(self):
         try:
+            self.progress.emit('AI 서버에 요청 전송 중...')
             text = AiService.enhance(
                 self.agent_type, self.system_prompt_text, self.plain_note,
             )
+            self.progress.emit('응답 수신 중...')
+            self.progress.emit('응답 정리 중...')
             self.result.emit(text)
         except Exception as e:
             self.error.emit(str(e))

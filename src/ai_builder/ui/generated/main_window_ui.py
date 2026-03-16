@@ -15,11 +15,11 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QComboBox, QDateEdit, QGridLayout,
-    QGroupBox, QHBoxLayout, QLabel, QLineEdit,
-    QListWidget, QListWidgetItem, QMainWindow, QPlainTextEdit,
-    QPushButton, QSizePolicy, QSpacerItem, QVBoxLayout,
-    QWidget)
+from PySide6.QtWidgets import (QApplication, QComboBox, QDateEdit, QFrame,
+    QGridLayout, QGroupBox, QHBoxLayout, QLabel,
+    QLineEdit, QListWidget, QListWidgetItem, QMainWindow,
+    QPlainTextEdit, QPushButton, QSizePolicy, QSpacerItem,
+    QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -58,90 +58,109 @@ class Ui_MainWindow(object):
         self.group_encounters.setObjectName(u"group_encounters")
         self.hboxLayout1 = QHBoxLayout(self.group_encounters)
         self.hboxLayout1.setObjectName(u"hboxLayout1")
-        self.vboxLayout = QVBoxLayout()
-        self.vboxLayout.setObjectName(u"vboxLayout")
+        self.widget_document_left = QWidget(self.group_encounters)
+        self.widget_document_left.setObjectName(u"widget_document_left")
+        self.widget_document_left.setMinimumSize(QSize(300, 0))
+        self.widget_document_left.setMaximumSize(QSize(300, 16777215))
+        self.verticalLayout_document_left = QVBoxLayout(self.widget_document_left)
+        self.verticalLayout_document_left.setObjectName(u"verticalLayout_document_left")
+        self.verticalLayout_document_left.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_encounter_date_controls = QGridLayout()
         self.gridLayout_encounter_date_controls.setObjectName(u"gridLayout_encounter_date_controls")
-        self.lbl_encounter_date = QLabel(self.group_encounters)
-        self.lbl_encounter_date.setObjectName(u"lbl_encounter_date")
-
-        self.gridLayout_encounter_date_controls.addWidget(self.lbl_encounter_date, 0, 1, 2, 1)
-
-        self.btn_prev_date = QPushButton(self.group_encounters)
+        self.btn_prev_date = QPushButton(self.widget_document_left)
         self.btn_prev_date.setObjectName(u"btn_prev_date")
-        sizePolicy = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.btn_prev_date.sizePolicy().hasHeightForWidth())
         self.btn_prev_date.setSizePolicy(sizePolicy)
+        self.btn_prev_date.setMinimumSize(QSize(32, 0))
+        self.btn_prev_date.setMaximumSize(QSize(32, 16777215))
 
-        self.gridLayout_encounter_date_controls.addWidget(self.btn_prev_date, 0, 2, 2, 1)
+        self.gridLayout_encounter_date_controls.addWidget(self.btn_prev_date, 0, 1, 2, 1)
 
-        self.date_edit_encounter = QDateEdit(self.group_encounters)
+        self.date_edit_encounter = QDateEdit(self.widget_document_left)
         self.date_edit_encounter.setObjectName(u"date_edit_encounter")
         self.date_edit_encounter.setCalendarPopup(True)
 
-        self.gridLayout_encounter_date_controls.addWidget(self.date_edit_encounter, 0, 3, 1, 1)
+        self.gridLayout_encounter_date_controls.addWidget(self.date_edit_encounter, 0, 2, 1, 1)
 
-        self.btn_next_date = QPushButton(self.group_encounters)
+        self.btn_next_date = QPushButton(self.widget_document_left)
         self.btn_next_date.setObjectName(u"btn_next_date")
         sizePolicy.setHeightForWidth(self.btn_next_date.sizePolicy().hasHeightForWidth())
         self.btn_next_date.setSizePolicy(sizePolicy)
+        self.btn_next_date.setMinimumSize(QSize(32, 0))
+        self.btn_next_date.setMaximumSize(QSize(32, 16777215))
 
-        self.gridLayout_encounter_date_controls.addWidget(self.btn_next_date, 0, 4, 2, 1)
+        self.gridLayout_encounter_date_controls.addWidget(self.btn_next_date, 0, 3, 2, 1)
 
-        self.btn_load_encounters = QPushButton(self.group_encounters)
+        self.btn_load_encounters = QPushButton(self.widget_document_left)
         self.btn_load_encounters.setObjectName(u"btn_load_encounters")
-        sizePolicy.setHeightForWidth(self.btn_load_encounters.sizePolicy().hasHeightForWidth())
-        self.btn_load_encounters.setSizePolicy(sizePolicy)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.btn_load_encounters.sizePolicy().hasHeightForWidth())
+        self.btn_load_encounters.setSizePolicy(sizePolicy1)
 
-        self.gridLayout_encounter_date_controls.addWidget(self.btn_load_encounters, 0, 5, 2, 1)
+        self.gridLayout_encounter_date_controls.addWidget(self.btn_load_encounters, 0, 4, 2, 1)
 
-        self.btn_go_today = QPushButton(self.group_encounters)
+        self.btn_go_today = QPushButton(self.widget_document_left)
         self.btn_go_today.setObjectName(u"btn_go_today")
 
-        self.gridLayout_encounter_date_controls.addWidget(self.btn_go_today, 1, 3, 1, 1)
+        self.gridLayout_encounter_date_controls.addWidget(self.btn_go_today, 1, 2, 1, 1)
 
 
-        self.vboxLayout.addLayout(self.gridLayout_encounter_date_controls)
+        self.verticalLayout_document_left.addLayout(self.gridLayout_encounter_date_controls)
 
-        self.list_encounters = QListWidget(self.group_encounters)
+        self.list_encounters = QTableWidget(self.widget_document_left)
         self.list_encounters.setObjectName(u"list_encounters")
+        self.list_encounters.setColumnCount(2)
+        self.list_encounters.setRowCount(0)
+        __qtablewidgetitem = QTableWidgetItem()
+        self.list_encounters.setHorizontalHeaderItem(0, __qtablewidgetitem)
+        __qtablewidgetitem1 = QTableWidgetItem()
+        self.list_encounters.setHorizontalHeaderItem(1, __qtablewidgetitem1)
 
-        self.vboxLayout.addWidget(self.list_encounters)
+        self.verticalLayout_document_left.addWidget(self.list_encounters)
 
 
-        self.hboxLayout1.addLayout(self.vboxLayout)
+        self.hboxLayout1.addWidget(self.widget_document_left)
 
-        self.vboxLayout1 = QVBoxLayout()
-        self.vboxLayout1.setObjectName(u"vboxLayout1")
+        self.vboxLayout = QVBoxLayout()
+        self.vboxLayout.setObjectName(u"vboxLayout")
         self.txt_plain_note = QPlainTextEdit(self.group_encounters)
         self.txt_plain_note.setObjectName(u"txt_plain_note")
 
-        self.vboxLayout1.addWidget(self.txt_plain_note)
+        self.vboxLayout.addWidget(self.txt_plain_note)
 
+        self.horizontalLayout_enhance_actions = QHBoxLayout()
+        self.horizontalLayout_enhance_actions.setObjectName(u"horizontalLayout_enhance_actions")
         self.btn_enhance = QPushButton(self.group_encounters)
         self.btn_enhance.setObjectName(u"btn_enhance")
 
-        self.vboxLayout1.addWidget(self.btn_enhance)
+        self.horizontalLayout_enhance_actions.addWidget(self.btn_enhance)
+
+        self.btn_result_view_settings = QPushButton(self.group_encounters)
+        self.btn_result_view_settings.setObjectName(u"btn_result_view_settings")
+
+        self.horizontalLayout_enhance_actions.addWidget(self.btn_result_view_settings)
+
+
+        self.vboxLayout.addLayout(self.horizontalLayout_enhance_actions)
 
         self.txt_enhanced_result = QPlainTextEdit(self.group_encounters)
         self.txt_enhanced_result.setObjectName(u"txt_enhanced_result")
+        self.txt_enhanced_result.setReadOnly(True)
 
-        self.vboxLayout1.addWidget(self.txt_enhanced_result)
+        self.vboxLayout.addWidget(self.txt_enhanced_result)
 
         self.btn_save_to_sigma = QPushButton(self.group_encounters)
         self.btn_save_to_sigma.setObjectName(u"btn_save_to_sigma")
 
-        self.vboxLayout1.addWidget(self.btn_save_to_sigma)
-
-        self.lbl_enhanced_result_status = QLabel(self.group_encounters)
-        self.lbl_enhanced_result_status.setObjectName(u"lbl_enhanced_result_status")
-
-        self.vboxLayout1.addWidget(self.lbl_enhanced_result_status)
+        self.vboxLayout.addWidget(self.btn_save_to_sigma)
 
 
-        self.hboxLayout1.addLayout(self.vboxLayout1)
+        self.hboxLayout1.addLayout(self.vboxLayout)
 
 
         self.verticalLayout_main.addWidget(self.group_encounters)
@@ -150,8 +169,8 @@ class Ui_MainWindow(object):
         self.group_system_prompts.setObjectName(u"group_system_prompts")
         self.hboxLayout2 = QHBoxLayout(self.group_system_prompts)
         self.hboxLayout2.setObjectName(u"hboxLayout2")
-        self.vboxLayout2 = QVBoxLayout()
-        self.vboxLayout2.setObjectName(u"vboxLayout2")
+        self.vboxLayout1 = QVBoxLayout()
+        self.vboxLayout1.setObjectName(u"vboxLayout1")
         self.horizontalLayout_ai_agent_selector = QHBoxLayout()
         self.horizontalLayout_ai_agent_selector.setObjectName(u"horizontalLayout_ai_agent_selector")
         self.label_ai_agent = QLabel(self.group_system_prompts)
@@ -165,7 +184,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_ai_agent_selector.addWidget(self.combo_ai_agent)
 
 
-        self.vboxLayout2.addLayout(self.horizontalLayout_ai_agent_selector)
+        self.vboxLayout1.addLayout(self.horizontalLayout_ai_agent_selector)
 
         self.horizontalLayout_system_prompt_header = QHBoxLayout()
         self.horizontalLayout_system_prompt_header.setObjectName(u"horizontalLayout_system_prompt_header")
@@ -178,18 +197,8 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_system_prompt_header.addItem(self.spacerItem1)
 
-        self.btn_sp_new = QPushButton(self.group_system_prompts)
-        self.btn_sp_new.setObjectName(u"btn_sp_new")
 
-        self.horizontalLayout_system_prompt_header.addWidget(self.btn_sp_new)
-
-        self.btn_sp_delete = QPushButton(self.group_system_prompts)
-        self.btn_sp_delete.setObjectName(u"btn_sp_delete")
-
-        self.horizontalLayout_system_prompt_header.addWidget(self.btn_sp_delete)
-
-
-        self.vboxLayout2.addLayout(self.horizontalLayout_system_prompt_header)
+        self.vboxLayout1.addLayout(self.horizontalLayout_system_prompt_header)
 
         self.horizontalLayout_system_prompt_list_area = QHBoxLayout()
         self.horizontalLayout_system_prompt_list_area.setObjectName(u"horizontalLayout_system_prompt_list_area")
@@ -203,6 +212,23 @@ class Ui_MainWindow(object):
         self.spacerItem2 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.verticalLayout_system_prompt_move_buttons.addItem(self.spacerItem2)
+
+        self.btn_sp_new = QPushButton(self.group_system_prompts)
+        self.btn_sp_new.setObjectName(u"btn_sp_new")
+
+        self.verticalLayout_system_prompt_move_buttons.addWidget(self.btn_sp_new)
+
+        self.btn_sp_delete = QPushButton(self.group_system_prompts)
+        self.btn_sp_delete.setObjectName(u"btn_sp_delete")
+
+        self.verticalLayout_system_prompt_move_buttons.addWidget(self.btn_sp_delete)
+
+        self.line_sp_action_separator = QFrame(self.group_system_prompts)
+        self.line_sp_action_separator.setObjectName(u"line_sp_action_separator")
+        self.line_sp_action_separator.setFrameShape(QFrame.Shape.HLine)
+        self.line_sp_action_separator.setFrameShadow(QFrame.Shadow.Sunken)
+
+        self.verticalLayout_system_prompt_move_buttons.addWidget(self.line_sp_action_separator)
 
         self.btn_sp_move_up = QPushButton(self.group_system_prompts)
         self.btn_sp_move_up.setObjectName(u"btn_sp_move_up")
@@ -222,13 +248,13 @@ class Ui_MainWindow(object):
         self.horizontalLayout_system_prompt_list_area.addLayout(self.verticalLayout_system_prompt_move_buttons)
 
 
-        self.vboxLayout2.addLayout(self.horizontalLayout_system_prompt_list_area)
+        self.vboxLayout1.addLayout(self.horizontalLayout_system_prompt_list_area)
 
 
-        self.hboxLayout2.addLayout(self.vboxLayout2)
+        self.hboxLayout2.addLayout(self.vboxLayout1)
 
-        self.vboxLayout3 = QVBoxLayout()
-        self.vboxLayout3.setObjectName(u"vboxLayout3")
+        self.vboxLayout2 = QVBoxLayout()
+        self.vboxLayout2.setObjectName(u"vboxLayout2")
         self.hboxLayout3 = QHBoxLayout()
         self.hboxLayout3.setObjectName(u"hboxLayout3")
         self.label = QLabel(self.group_system_prompts)
@@ -242,12 +268,12 @@ class Ui_MainWindow(object):
         self.hboxLayout3.addWidget(self.edit_sp_title)
 
 
-        self.vboxLayout3.addLayout(self.hboxLayout3)
+        self.vboxLayout2.addLayout(self.hboxLayout3)
 
         self.label1 = QLabel(self.group_system_prompts)
         self.label1.setObjectName(u"label1")
 
-        self.vboxLayout3.addWidget(self.label1)
+        self.vboxLayout2.addWidget(self.label1)
 
         self.horizontalLayout_sp_content_area = QHBoxLayout()
         self.horizontalLayout_sp_content_area.setObjectName(u"horizontalLayout_sp_content_area")
@@ -284,10 +310,10 @@ class Ui_MainWindow(object):
         self.horizontalLayout_sp_content_area.addLayout(self.verticalLayout_sp_action_buttons)
 
 
-        self.vboxLayout3.addLayout(self.horizontalLayout_sp_content_area)
+        self.vboxLayout2.addLayout(self.horizontalLayout_sp_content_area)
 
 
-        self.hboxLayout2.addLayout(self.vboxLayout3)
+        self.hboxLayout2.addLayout(self.vboxLayout2)
 
 
         self.verticalLayout_main.addWidget(self.group_system_prompts)
@@ -304,20 +330,23 @@ class Ui_MainWindow(object):
         self.lbl_connection_status_icon.setText(QCoreApplication.translate("MainWindow", u"\u26aa", None))
         self.lbl_connection_status_text.setText(QCoreApplication.translate("MainWindow", u"\ubbf8\uc124\uc815", None))
         self.btn_open_settings.setText(QCoreApplication.translate("MainWindow", u"\u2699 API \ud0a4 \uc124\uc815", None))
-        self.group_encounters.setTitle(QCoreApplication.translate("MainWindow", u"\uc9c4\ub8cc \ubaa9\ub85d", None))
-        self.lbl_encounter_date.setText(QCoreApplication.translate("MainWindow", u"\ub0a0\uc9dc:", None))
+        self.group_encounters.setTitle(QCoreApplication.translate("MainWindow", u"\ubb38\uc11c", None))
         self.btn_prev_date.setText(QCoreApplication.translate("MainWindow", u"\u25c0", None))
         self.date_edit_encounter.setDisplayFormat(QCoreApplication.translate("MainWindow", u"yyyy-MM-dd", None))
         self.btn_next_date.setText(QCoreApplication.translate("MainWindow", u"\u25b6", None))
         self.btn_load_encounters.setText(QCoreApplication.translate("MainWindow", u"\uc870\ud68c", None))
         self.btn_go_today.setText(QCoreApplication.translate("MainWindow", u"\uc624\ub298\ub85c \uc774\ub3d9", None))
+        ___qtablewidgetitem = self.list_encounters.horizontalHeaderItem(0)
+        ___qtablewidgetitem.setText(QCoreApplication.translate("MainWindow", u"No.", None));
+        ___qtablewidgetitem1 = self.list_encounters.horizontalHeaderItem(1)
+        ___qtablewidgetitem1.setText(QCoreApplication.translate("MainWindow", u"Name", None));
         self.txt_plain_note.setPlaceholderText(QCoreApplication.translate("MainWindow", u"\ubcf4\uac15\ud560 \ubb38\uc11c\ub97c \ub123\uc5b4\uc8fc\uc138\uc694.", None))
         self.btn_enhance.setText(QCoreApplication.translate("MainWindow", u"Enhance", None))
+        self.btn_result_view_settings.setText(QCoreApplication.translate("MainWindow", u"\uacb0\uacfc\ubcf4\uae30 \uc124\uc815", None))
         self.txt_enhanced_result.setPlaceholderText(QCoreApplication.translate("MainWindow", u"AI Enhance \uacb0\uacfc\uac00 \uc5ec\uae30\uc5d0 \ud45c\uc2dc\ub429\ub2c8\ub2e4", None))
-        self.btn_save_to_sigma.setText(QCoreApplication.translate("MainWindow", u"\ucc28\ud2b8\uc5d0 \uc800\uc7a5", None))
-        self.lbl_enhanced_result_status.setText(QCoreApplication.translate("MainWindow", u"\uc800\uc7a5\ud560 Enhance \uacb0\uacfc\uac00 \uc5c6\uc2b5\ub2c8\ub2e4.", None))
+        self.btn_save_to_sigma.setText(QCoreApplication.translate("MainWindow", u"\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac", None))
         self.group_system_prompts.setTitle(QCoreApplication.translate("MainWindow", u"AI Agent", None))
-        self.label_ai_agent.setText(QCoreApplication.translate("MainWindow", u"\ubaa8\ub378 \uc120\ud0dd:", None))
+        self.label_ai_agent.setText(QCoreApplication.translate("MainWindow", u"Agent \uc120\ud0dd:", None))
         self.label_system_prompt_list.setText(QCoreApplication.translate("MainWindow", u"System Prompt", None))
         self.btn_sp_new.setText(QCoreApplication.translate("MainWindow", u"\uc0c8\ub85c \ub9cc\ub4e4\uae30", None))
         self.btn_sp_delete.setText(QCoreApplication.translate("MainWindow", u"\uc0ad\uc81c", None))

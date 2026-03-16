@@ -744,40 +744,25 @@ class MainWindow(QMainWindow):
         """System Prompt 편집 영역 활성화/비활성화"""
         self.ui.edit_sp_title.setReadOnly(not enabled)
         self.ui.txt_sp_content.setReadOnly(not enabled)
-        self.ui.btn_sp_cancel.setVisible(enabled)
-        self.ui.btn_sp_cancel.setEnabled(enabled)
-        self.ui.btn_sp_save.setVisible(enabled)
 
         # 편집 중에는 좌측 목록/버튼 비활성화
         self.ui.list_system_prompts.setEnabled(not enabled)
         self.ui.btn_sp_new.setEnabled(not enabled)
-        self.ui.btn_sp_edit.setEnabled(not enabled)
         self.ui.btn_sp_delete.setEnabled(not enabled)
         self.ui.btn_sp_move_up.setEnabled(not enabled)
         self.ui.btn_sp_move_down.setEnabled(not enabled)
 
     def _update_sp_editor_actions(self):
-        """System Prompt 편집 상태에 따라 액션 버튼과 상태 텍스트 갱신"""
+        """System Prompt 편집 상태에 따라 액션 버튼 활성 상태 갱신"""
         is_editing = bool(self._sp_edit_mode)
         is_dirty = self._sp_dirty
+        has_selection = bool(self.current_sp_id)
 
+        self.ui.btn_sp_edit.setEnabled((not is_editing) and has_selection)
         self.ui.btn_sp_save.setEnabled(is_editing and is_dirty)
-        self.ui.btn_sp_save.setVisible(is_editing)
         self.ui.btn_sp_cancel.setEnabled(is_editing)
-        self.ui.btn_sp_cancel.setVisible(is_editing)
         self.ui.btn_sp_save.setDefault(is_editing)
         self.ui.btn_sp_save.setAutoDefault(is_editing)
-
-        if self._sp_edit_mode == 'new':
-            status_text = '새 System Prompt 작성 중'
-        elif self._sp_edit_mode == 'edit' and is_dirty:
-            status_text = '편집 중, 저장되지 않은 변경 사항 있음'
-        elif self._sp_edit_mode == 'edit':
-            status_text = '편집 중'
-        else:
-            status_text = '읽기 전용'
-
-        self.ui.lbl_sp_editor_status.setText(status_text)
 
     def _select_sp_by_id(self, sp_id: str):
         """System Prompt ID로 목록에서 선택"""

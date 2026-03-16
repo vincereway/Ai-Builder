@@ -47,7 +47,7 @@
       <item>
        <widget class="QPushButton" name="btn_open_settings">
         <property name="text">
-         <string>⚙ 설정</string>
+               <string>⚙ API 키 설정</string>
         </property>
        </widget>
       </item>
@@ -222,14 +222,7 @@
                     <item>
                      <widget class="QPushButton" name="btn_sp_new">
                       <property name="text">
-                       <string>신규</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QPushButton" name="btn_sp_edit">
-                      <property name="text">
-                       <string>수정</string>
+                                             <string>새로 만들기</string>
                       </property>
                      </widget>
                     </item>
@@ -242,34 +235,57 @@
                     </item>
                    </layout>
                   </item>
-         <item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_system_prompt_list_area">
+          <item>
           <widget class="QListWidget" name="list_system_prompts"/>
-         </item>
-         <item>
-          <layout class="QHBoxLayout">
-                                    <item>
-                                          <widget class="QLabel" name="label_sp_reorder">
-                                           <property name="text">
-                                                 <string>순서 변경하기</string>
-                                           </property>
-                                          </widget>
-                                    </item>
+          </item>
+          <item>
+          <layout class="QVBoxLayout" name="verticalLayout_system_prompt_move_buttons">
+           <item>
+            <spacer>
+             <property name="orientation">
+              <enum>Qt::Orientation::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
            <item>
             <widget class="QPushButton" name="btn_sp_move_up">
              <property name="text">
-              <string>▲ 위</string>
+                                        <string>▲ 위로</string>
              </property>
             </widget>
            </item>
            <item>
             <widget class="QPushButton" name="btn_sp_move_down">
              <property name="text">
-              <string>▼ 아래</string>
+                                        <string>▼ 아래로</string>
              </property>
             </widget>
            </item>
+           <item>
+            <spacer>
+             <property name="orientation">
+              <enum>Qt::Orientation::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
           </layout>
-         </item>
+          </item>
+         </layout>
+        </item>
         </layout>
        </item>
        <item>
@@ -296,56 +312,66 @@
           </widget>
          </item>
          <item>
-          <widget class="QPlainTextEdit" name="txt_sp_content"/>
-         </item>
-         <item>
-          <layout class="QHBoxLayout">
-           <item>
-            <widget class="QLabel" name="lbl_sp_editor_status">
-             <property name="text">
-              <string>읽기 전용</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer>
-             <property name="orientation">
-              <enum>Qt::Orientation::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>0</width>
-               <height>0</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QPushButton" name="btn_sp_cancel">
-             <property name="minimumSize">
-              <size>
-               <width>96</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>취소</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="btn_sp_save">
-             <property name="minimumSize">
-              <size>
-               <width>96</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>저장</string>
-             </property>
-            </widget>
-           </item>
+                         <layout class="QHBoxLayout" name="horizontalLayout_sp_content_area">
+                          <item>
+                              <widget class="QPlainTextEdit" name="txt_sp_content"/>
+                          </item>
+                          <item>
+                              <layout class="QVBoxLayout" name="verticalLayout_sp_action_buttons">
+                               <item>
+                                   <widget class="QPushButton" name="btn_sp_edit">
+                                    <property name="minimumSize">
+                                        <size>
+                                         <width>96</width>
+                                         <height>0</height>
+                                        </size>
+                                    </property>
+                                    <property name="text">
+                                        <string>수정</string>
+                                    </property>
+                                   </widget>
+                               </item>
+                               <item>
+                                   <widget class="QPushButton" name="btn_sp_cancel">
+                                    <property name="minimumSize">
+                                        <size>
+                                         <width>96</width>
+                                         <height>0</height>
+                                        </size>
+                                    </property>
+                                    <property name="text">
+                                        <string>취소</string>
+                                    </property>
+                                   </widget>
+                               </item>
+                               <item>
+                                   <widget class="QPushButton" name="btn_sp_save">
+                                    <property name="minimumSize">
+                                        <size>
+                                         <width>96</width>
+                                         <height>0</height>
+                                        </size>
+                                    </property>
+                                    <property name="text">
+                                        <string>저장</string>
+                                    </property>
+                                   </widget>
+                               </item>
+                               <item>
+                                   <spacer>
+                                    <property name="orientation">
+                                        <enum>Qt::Orientation::Vertical</enum>
+                                    </property>
+                                    <property name="sizeHint" stdset="0">
+                                        <size>
+                                         <width>20</width>
+                                         <height>40</height>
+                                        </size>
+                                    </property>
+                                   </spacer>
+                               </item>
+                              </layout>
+                          </item>
           </layout>
          </item>
         </layout>

@@ -183,11 +183,6 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_system_prompt_header.addWidget(self.btn_sp_new)
 
-        self.btn_sp_edit = QPushButton(self.group_system_prompts)
-        self.btn_sp_edit.setObjectName(u"btn_sp_edit")
-
-        self.horizontalLayout_system_prompt_header.addWidget(self.btn_sp_edit)
-
         self.btn_sp_delete = QPushButton(self.group_system_prompts)
         self.btn_sp_delete.setObjectName(u"btn_sp_delete")
 
@@ -196,86 +191,100 @@ class Ui_MainWindow(object):
 
         self.vboxLayout2.addLayout(self.horizontalLayout_system_prompt_header)
 
+        self.horizontalLayout_system_prompt_list_area = QHBoxLayout()
+        self.horizontalLayout_system_prompt_list_area.setObjectName(u"horizontalLayout_system_prompt_list_area")
         self.list_system_prompts = QListWidget(self.group_system_prompts)
         self.list_system_prompts.setObjectName(u"list_system_prompts")
 
-        self.vboxLayout2.addWidget(self.list_system_prompts)
+        self.horizontalLayout_system_prompt_list_area.addWidget(self.list_system_prompts)
 
-        self.hboxLayout3 = QHBoxLayout()
-        self.hboxLayout3.setObjectName(u"hboxLayout3")
-        self.label_sp_reorder = QLabel(self.group_system_prompts)
-        self.label_sp_reorder.setObjectName(u"label_sp_reorder")
+        self.verticalLayout_system_prompt_move_buttons = QVBoxLayout()
+        self.verticalLayout_system_prompt_move_buttons.setObjectName(u"verticalLayout_system_prompt_move_buttons")
+        self.spacerItem2 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
-        self.hboxLayout3.addWidget(self.label_sp_reorder)
+        self.verticalLayout_system_prompt_move_buttons.addItem(self.spacerItem2)
 
         self.btn_sp_move_up = QPushButton(self.group_system_prompts)
         self.btn_sp_move_up.setObjectName(u"btn_sp_move_up")
 
-        self.hboxLayout3.addWidget(self.btn_sp_move_up)
+        self.verticalLayout_system_prompt_move_buttons.addWidget(self.btn_sp_move_up)
 
         self.btn_sp_move_down = QPushButton(self.group_system_prompts)
         self.btn_sp_move_down.setObjectName(u"btn_sp_move_down")
 
-        self.hboxLayout3.addWidget(self.btn_sp_move_down)
+        self.verticalLayout_system_prompt_move_buttons.addWidget(self.btn_sp_move_down)
+
+        self.spacerItem3 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout_system_prompt_move_buttons.addItem(self.spacerItem3)
 
 
-        self.vboxLayout2.addLayout(self.hboxLayout3)
+        self.horizontalLayout_system_prompt_list_area.addLayout(self.verticalLayout_system_prompt_move_buttons)
+
+
+        self.vboxLayout2.addLayout(self.horizontalLayout_system_prompt_list_area)
 
 
         self.hboxLayout2.addLayout(self.vboxLayout2)
 
         self.vboxLayout3 = QVBoxLayout()
         self.vboxLayout3.setObjectName(u"vboxLayout3")
-        self.hboxLayout4 = QHBoxLayout()
-        self.hboxLayout4.setObjectName(u"hboxLayout4")
+        self.hboxLayout3 = QHBoxLayout()
+        self.hboxLayout3.setObjectName(u"hboxLayout3")
         self.label = QLabel(self.group_system_prompts)
         self.label.setObjectName(u"label")
 
-        self.hboxLayout4.addWidget(self.label)
+        self.hboxLayout3.addWidget(self.label)
 
         self.edit_sp_title = QLineEdit(self.group_system_prompts)
         self.edit_sp_title.setObjectName(u"edit_sp_title")
 
-        self.hboxLayout4.addWidget(self.edit_sp_title)
+        self.hboxLayout3.addWidget(self.edit_sp_title)
 
 
-        self.vboxLayout3.addLayout(self.hboxLayout4)
+        self.vboxLayout3.addLayout(self.hboxLayout3)
 
         self.label1 = QLabel(self.group_system_prompts)
         self.label1.setObjectName(u"label1")
 
         self.vboxLayout3.addWidget(self.label1)
 
+        self.horizontalLayout_sp_content_area = QHBoxLayout()
+        self.horizontalLayout_sp_content_area.setObjectName(u"horizontalLayout_sp_content_area")
         self.txt_sp_content = QPlainTextEdit(self.group_system_prompts)
         self.txt_sp_content.setObjectName(u"txt_sp_content")
 
-        self.vboxLayout3.addWidget(self.txt_sp_content)
+        self.horizontalLayout_sp_content_area.addWidget(self.txt_sp_content)
 
-        self.hboxLayout5 = QHBoxLayout()
-        self.hboxLayout5.setObjectName(u"hboxLayout5")
-        self.lbl_sp_editor_status = QLabel(self.group_system_prompts)
-        self.lbl_sp_editor_status.setObjectName(u"lbl_sp_editor_status")
+        self.verticalLayout_sp_action_buttons = QVBoxLayout()
+        self.verticalLayout_sp_action_buttons.setObjectName(u"verticalLayout_sp_action_buttons")
+        self.btn_sp_edit = QPushButton(self.group_system_prompts)
+        self.btn_sp_edit.setObjectName(u"btn_sp_edit")
+        self.btn_sp_edit.setMinimumSize(QSize(96, 0))
 
-        self.hboxLayout5.addWidget(self.lbl_sp_editor_status)
-
-        self.spacerItem2 = QSpacerItem(0, 0, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-
-        self.hboxLayout5.addItem(self.spacerItem2)
+        self.verticalLayout_sp_action_buttons.addWidget(self.btn_sp_edit)
 
         self.btn_sp_cancel = QPushButton(self.group_system_prompts)
         self.btn_sp_cancel.setObjectName(u"btn_sp_cancel")
         self.btn_sp_cancel.setMinimumSize(QSize(96, 0))
 
-        self.hboxLayout5.addWidget(self.btn_sp_cancel)
+        self.verticalLayout_sp_action_buttons.addWidget(self.btn_sp_cancel)
 
         self.btn_sp_save = QPushButton(self.group_system_prompts)
         self.btn_sp_save.setObjectName(u"btn_sp_save")
         self.btn_sp_save.setMinimumSize(QSize(96, 0))
 
-        self.hboxLayout5.addWidget(self.btn_sp_save)
+        self.verticalLayout_sp_action_buttons.addWidget(self.btn_sp_save)
+
+        self.spacerItem4 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout_sp_action_buttons.addItem(self.spacerItem4)
 
 
-        self.vboxLayout3.addLayout(self.hboxLayout5)
+        self.horizontalLayout_sp_content_area.addLayout(self.verticalLayout_sp_action_buttons)
+
+
+        self.vboxLayout3.addLayout(self.horizontalLayout_sp_content_area)
 
 
         self.hboxLayout2.addLayout(self.vboxLayout3)
@@ -294,7 +303,7 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Ai-Builder", None))
         self.lbl_connection_status_icon.setText(QCoreApplication.translate("MainWindow", u"\u26aa", None))
         self.lbl_connection_status_text.setText(QCoreApplication.translate("MainWindow", u"\ubbf8\uc124\uc815", None))
-        self.btn_open_settings.setText(QCoreApplication.translate("MainWindow", u"\u2699 \uc124\uc815", None))
+        self.btn_open_settings.setText(QCoreApplication.translate("MainWindow", u"\u2699 API \ud0a4 \uc124\uc815", None))
         self.group_encounters.setTitle(QCoreApplication.translate("MainWindow", u"\uc9c4\ub8cc \ubaa9\ub85d", None))
         self.lbl_encounter_date.setText(QCoreApplication.translate("MainWindow", u"\ub0a0\uc9dc:", None))
         self.btn_prev_date.setText(QCoreApplication.translate("MainWindow", u"\u25c0", None))
@@ -310,15 +319,13 @@ class Ui_MainWindow(object):
         self.group_system_prompts.setTitle(QCoreApplication.translate("MainWindow", u"AI Agent", None))
         self.label_ai_agent.setText(QCoreApplication.translate("MainWindow", u"\ubaa8\ub378 \uc120\ud0dd:", None))
         self.label_system_prompt_list.setText(QCoreApplication.translate("MainWindow", u"System Prompt", None))
-        self.btn_sp_new.setText(QCoreApplication.translate("MainWindow", u"\uc2e0\uaddc", None))
-        self.btn_sp_edit.setText(QCoreApplication.translate("MainWindow", u"\uc218\uc815", None))
+        self.btn_sp_new.setText(QCoreApplication.translate("MainWindow", u"\uc0c8\ub85c \ub9cc\ub4e4\uae30", None))
         self.btn_sp_delete.setText(QCoreApplication.translate("MainWindow", u"\uc0ad\uc81c", None))
-        self.label_sp_reorder.setText(QCoreApplication.translate("MainWindow", u"\uc21c\uc11c \ubcc0\uacbd\ud558\uae30", None))
-        self.btn_sp_move_up.setText(QCoreApplication.translate("MainWindow", u"\u25b2 \uc704", None))
-        self.btn_sp_move_down.setText(QCoreApplication.translate("MainWindow", u"\u25bc \uc544\ub798", None))
+        self.btn_sp_move_up.setText(QCoreApplication.translate("MainWindow", u"\u25b2 \uc704\ub85c", None))
+        self.btn_sp_move_down.setText(QCoreApplication.translate("MainWindow", u"\u25bc \uc544\ub798\ub85c", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"\uc81c\ubaa9:", None))
         self.label1.setText(QCoreApplication.translate("MainWindow", u"\ub0b4\uc6a9:", None))
-        self.lbl_sp_editor_status.setText(QCoreApplication.translate("MainWindow", u"\uc77d\uae30 \uc804\uc6a9", None))
+        self.btn_sp_edit.setText(QCoreApplication.translate("MainWindow", u"\uc218\uc815", None))
         self.btn_sp_cancel.setText(QCoreApplication.translate("MainWindow", u"\ucde8\uc18c", None))
         self.btn_sp_save.setText(QCoreApplication.translate("MainWindow", u"\uc800\uc7a5", None))
     # retranslateUi

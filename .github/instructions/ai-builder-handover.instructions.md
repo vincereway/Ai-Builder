@@ -11,7 +11,7 @@ description: "Current Ai-Builder runtime behavior, architecture, UX rules, and k
 
 - 실제 동작 판단은 현재 코드가 최우선입니다.
 - 이 문서는 현재 UX와 설계 의도를 짧게 고정합니다.
-- 과거 설계 서술은 `DEVELOPMENT.md`보다 이 문서를 우선합니다.
+- 별도 레거시 설계 문서는 유지하지 않으며, 현재 구조 설명은 이 문서를 기준으로 봅니다.
 
 ## 2. 현재 앱 요약
 

@@ -9,7 +9,6 @@
 3. `.github/instructions/ai-builder-implementation-notes.instructions.md`
 4. `.github/instructions/secrets-and-git-hygiene.instructions.md`
 5. `.github/instructions/verification-runbook.instructions.md`
-6. `DEVELOPMENT.md`
 
 문서 사용 방식:
 
@@ -17,7 +16,6 @@
 - 최근 변경 이유와 회귀 포인트는 implementation notes를 우선 봅니다.
 - 보안, git 추적 안전성, 민감정보 규칙은 secrets 문서를 우선 봅니다.
 - 검증 명령과 재현 절차는 verification runbook을 필요 시 참고합니다.
-- `DEVELOPMENT.md`는 현재 구현 요약과 개발 진입용 참고 문서입니다.
 
 항상 지킬 것:
 
